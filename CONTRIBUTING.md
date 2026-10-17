@@ -22,7 +22,7 @@ Please check the existing issues first.
 ## Pull requests
 
 Code contributions (pull requests) are **not accepted at the moment**, while the
-project is in its early stage. Pull requests may be closed without review.
+project is in its early stage, so pull requests are turned off in this repository.
 If you have an idea or a fix, please open an issue and describe it instead.
 
 ## Security issues
