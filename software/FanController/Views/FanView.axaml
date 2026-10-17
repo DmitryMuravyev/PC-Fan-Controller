@@ -1,0 +1,1626 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ct="using:FanController.Contracts"
+             xmlns:vm="using:FanController.ViewModels"
+             xmlns:lc="using:FanController.Controls"
+             xmlns:lv="using:FanController.Views"
+             xmlns:cv="using:FanController.Converters"
+             xmlns:lz="using:FanController.Localization"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="640"
+             x:Class="FanController.Views.FanView"
+             x:DataType="vm:FanViewModel">
+
+    <UserControl.Styles>
+        <!-- Drawn elements Enabled/Disabled styles -->
+        <Style Selector="PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+        </Style>
+        <Style Selector="PathIcon:disabled">
+            <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}" />
+        </Style>
+
+        <!-- TextBlock Enabled/Disabled styles -->
+        <Style Selector="TextBlock.deactivatable:disabled">
+            <Setter Property="Opacity" Value="0.4" />
+        </Style>
+
+        <!-- Force DataGrid to select only rows, but not the individual cells -->
+        <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+
+        <!-- Disable Flyout menu scroll arrows (for clean rendering on Linux) -->
+        <Style Selector="MenuFlyoutPresenter">
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+        </Style>
+    </UserControl.Styles>
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Top row with buttons -->
+            <RowDefinition Height="Auto"/>  <!-- Separator row -->
+            <RowDefinition Height="*"/>     <!-- Fans table -->
+            <RowDefinition Height="Auto"/>  <!-- Status Indicators row -->
+        </Grid.RowDefinitions>
+
+        <!-- Top row with main buttons -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                <!-- Operation Mode buttons -->
+                <Button Content="{lz:Localize ButtonOperationModeSilentCaption}" 
+                        Click="OnOperationModeClick"
+                        Tag="{x:Static ct:FanOperationMode.OperationSilent}"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Margin="10,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonOperationModeSilentTip}" />
+                <Button Content="{lz:Localize ButtonOperationModeNormalCaption}" 
+                        Click="OnOperationModeClick"
+                        Tag="{x:Static ct:FanOperationMode.OperationNormal}" 
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonOperationModeNormalTip}" />
+                <Button Content="{lz:Localize ButtonOperationModeManualCaption}" 
+                        Click="OnOperationModeClick"
+                        Tag="{x:Static ct:FanOperationMode.OperationManual}"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonOperationModeManualTip}" />
+                <Button Content="{lz:Localize ButtonOperationModeTurboCaption}" 
+                        Click="OnOperationModeClick"
+                        Tag="{x:Static ct:FanOperationMode.OperationTurbo}"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonOperationModeTurboTip}" />
+
+                <!-- Power Profile menu -->
+                <Button Margin="5,10,5,5"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        ToolTip.Tip="{lz:Localize ButtonPowerProfileMenuTip}">
+                    <Button.Flyout>
+                        <MenuFlyout Placement="Bottom">
+                            <MenuItem Header="{lz:Localize FanPowerProfileProfileEasyValue}" 
+                                      Click="OnPowerProfileClick"
+                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileEasy}"/>            
+                            <MenuItem Header="{lz:Localize FanPowerProfileProfileChillValue}" 
+                                      Click="OnPowerProfileClick"
+                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileChill}"/>            
+                            <MenuItem Header="{lz:Localize FanPowerProfileProfileNormalValue}" 
+                                      Click="OnPowerProfileClick"
+                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileNormal}"/>
+                            <MenuItem Header="{lz:Localize FanPowerProfileProfileBusyValue}" 
+                                      Click="OnPowerProfileClick"
+                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileBusy}"/>
+                            <MenuItem Header="{lz:Localize FanPowerProfileProfileHardValue}" 
+                                      Click="OnPowerProfileClick"
+                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileHard}"/>
+                            <MenuItem Header="{lz:Localize FanPowerProfileProfileCustomValue}"
+                                      Click="OnPowerProfileClick"
+                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileCustom}"/>
+                        </MenuFlyout>
+                    </Button.Flyout>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" IsEnabled="{Binding SelectionNotEmpty}">
+                        <TextBlock Text="{lz:Localize ButtonPowerProfileMenuCaption}" VerticalAlignment="Center" />
+                        <PathIcon Width="8" Height="8"
+                                  VerticalAlignment="Center"
+                                  Margin="0,2,0,0"
+                                  Data="M0,0 L4,4 L8,0" />
+                    </StackPanel>
+
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{lz:Localize ButtonResetFanCaption}" 
+                        Click="OnResetStateClick"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonResetFanTip}" />
+
+                <Button Click="OnRescanHardwareClick"
+                        Margin="5,10,5,5" >
+                    <Button.Content>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="ScanAll"/>
+                            <ReflectionBinding Path="[ButtonRescanAllHardwareCaption]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonRescanHardwareCaption]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </Button.Content>
+                    <ToolTip.Tip>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="ScanAll"/>
+                            <ReflectionBinding Path="[ButtonRescanAllHardwareTip]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonRescanHardwareTip]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </ToolTip.Tip>
+                    <Button.Background>
+                        <MultiBinding Converter="{x:Static cv:TintedBackgroundConverter.Instance}">
+                            <!-- [0] bool from ViewModel -->
+                            <Binding Path="ScanAll" />
+
+                            <!-- [1] The Button control itself — needed to call .ActualThemeVariant -->
+                            <Binding RelativeSource="{RelativeSource Self}" />
+
+                            <!-- [2] ActualThemeVariant - re-fires the converter when theme changes -->
+                            <ReflectionBinding RelativeSource="{RelativeSource Self}" Path="ActualThemeVariant"/> 
+                        </MultiBinding>
+                    </Button.Background>
+                </Button>
+
+                <Button Click="OnRescanModelClick"
+                        Margin="5,10,10,5" >
+                    <Button.Content>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="ScanAll"/>
+                            <ReflectionBinding Path="[ButtonRescanAllFansCaption]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonRescanFanCaption]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </Button.Content>
+                    <ToolTip.Tip>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="ScanAll"/>
+                            <ReflectionBinding Path="[ButtonRescanAllFansTip]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonRescanFanTip]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </ToolTip.Tip>
+                    <Button.Background>
+                        <MultiBinding Converter="{x:Static cv:TintedBackgroundConverter.Instance}">
+                            <!-- [0] bool from ViewModel -->
+                            <Binding Path="ScanAll" />
+
+                            <!-- [1] The Button control itself — needed to call .ActualThemeVariant -->
+                            <Binding RelativeSource="{RelativeSource Self}" />
+
+                            <!-- [2] ActualThemeVariant - re-fires the converter when theme changes -->
+                            <ReflectionBinding RelativeSource="{RelativeSource Self}" Path="ActualThemeVariant"/> 
+                        </MultiBinding>
+                    </Button.Background>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Separator row -->
+        <Separator Grid.Row="1" />
+
+        <DataGrid Grid.Row="2"
+              ItemsSource="{Binding Fans}"
+              AutoGenerateColumns="False"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="False"
+              IsReadOnly="False"
+              HeadersVisibility="Column"
+              GridLinesVisibility="Horizontal"
+              SelectionMode="Single"
+              SelectedItem="{Binding CurrentFan, Mode=TwoWay}"
+              VerticalScrollBarVisibility="Auto"
+              RowHeight="40"
+              Margin="5">
+
+            <DataGrid.Columns>
+
+                <!-- Selection checkbox -->
+                <DataGridTemplateColumn Width="70" MinWidth="70"
+                                        CanUserResize="False"
+                                        CanUserReorder="False">
+                    <!-- Header with CheckBox -->
+                    <DataGridTemplateColumn.Header>
+                        <CheckBox Initialized="OnHeaderCheckBoxInitialized"
+                                  Margin="0"
+                                  Padding="0"
+                                  HorizontalAlignment="Left" />
+                    </DataGridTemplateColumn.Header>
+
+                    <!-- Cell with CheckBox -->
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <CheckBox IsChecked="{Binding Selected}"
+                                      HorizontalAlignment="Left"
+                                      Margin="12,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Fan number -->
+                <!--
+                <DataGridTemplateColumn Header="#" Width="60" MinWidth="60">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock VerticalAlignment="Center"
+                                       Margin="12,0"
+                                       Text="{Binding $parent[DataGridRow].Index}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                -->
+
+                <!-- Configured Fan Name -->
+                <DataGridTextColumn Width="*"
+                                    MinWidth="100"
+                                    CanUserReorder="True"
+                                    IsReadOnly="True"
+                                    Binding="{Binding FanConfig.Name, Mode=OneWay}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanNameCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanNameTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Status with color indicator -->
+                <DataGridTemplateColumn Width="90"
+                                        CanUserResize="False">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanStatusCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanStatusTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <Border CornerRadius="4"
+                                    Padding="8,2"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding Status,
+                                        Converter={x:Static cv:FanStatusToBackgroundConverter.Instance}, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Ellipse Width="10" Height="10"
+                                             Margin="0,0,6,0"
+                                             Fill="{Binding Status,
+                                        Converter={x:Static cv:FanStatusToBackgroundConverter.Instance}, ConverterParameter=True, Mode=OneWay}" />
+                                    <TextBlock FontSize="11"
+                                               FontWeight="SemiBold"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                                <Binding Path="Status" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            
+                <!-- Errors count -->
+                <DataGridTextColumn Width="80"
+                                    MinWidth="80"
+                                    CanUserReorder="True"
+                                    CanUserResize="False"
+                                    IsReadOnly="True"
+                                    Binding="{Binding FanState.TotalErrorsCount, StringFormat='{}{0}', Mode=OneWay}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanErrorsCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanErrorsTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Control mode indicator: PWM, DC-DC or ON/OFF -->
+                <DataGridTemplateColumn Width="80"
+                                        MinWidth="80"
+                                        CanUserResize="False">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanModesCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanModesTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Image Source="{Binding FanState.ControlMode,
+                                           Converter={x:Static cv:FanControlModeToIconConverter.Instance}}"
+                                   Width="32"
+                                   Height="32"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,2,0"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality">
+                                   <ToolTip.Tip>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="FanState.ControlMode" />
+                                            <Binding Source="Tip" />
+                                        </MultiBinding>
+                                   </ToolTip.Tip>
+                                </Image>
+                                <Image Source="{Binding FanState.OperationMode,
+                                           Converter={x:Static cv:FanOperationModeToIconConverter.Instance}}"
+                                   Width="32"
+                                   Height="32"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="2,0,0,0"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality">
+                                    <ToolTip.Tip>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="FanState.OperationMode" />
+                                            <Binding Source="Tip" />
+                                        </MultiBinding>
+                                   </ToolTip.Tip>
+                                </Image>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Range slider -->
+                <DataGridTemplateColumn Width="160" MinWidth="160" CanUserReorder="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanPowerProfileCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanPowerProfileTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  Margin="8,0">
+                                <Grid.IsEnabled>
+                                    <MultiBinding Converter="{x:Static cv:BooleanStateConverter.Instance}">
+                                        <Binding Path="PowerProfile"
+                                                 Converter="{x:Static cv:EnumEqualConverter.Instance}"
+                                                 ConverterParameter="{x:Static vm:FanItem+FanPowerProfile.ProfileCustom}"
+                                                 Mode="OneWay" />
+                                        <Binding Path="FanState.OperationMode"
+                                                 Converter="{x:Static cv:EnumEqualConverter.Instance}"
+                                                 ConverterParameter="{x:Static ct:FanOperationMode.OperationNormal}"
+                                                 Mode="OneWay" />
+                                    </MultiBinding>
+                                </Grid.IsEnabled>
+
+                                <lc:CompactSlider Grid.Column="0" Classes="rangeTrack"
+                                            Minimum="0"
+                                            Maximum="1"
+                                            SmallChange="0.01"
+                                            Value="{Binding ControlBasis}"
+                                            RangeStart="{Binding ControlBasis, Converter={x:Static cv:BasisToRangeConverter.Instance}, ConverterParameter=True, Mode=OneWay}" 
+                                            RangeEnd="{Binding ControlBasis, Converter={x:Static cv:BasisToRangeConverter.Instance}, ConverterParameter=False, Mode=OneWay}">
+                                </lc:CompactSlider>
+                                <TextBlock Grid.Column="1"
+                                            Classes="deactivatable"
+                                            FontSize="11"
+                                            Foreground="{DynamicResource SystemBaseMediumColor}"
+                                            Width="60"
+                                            TextAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Margin="4,0,0,0"
+                                            Text="{Binding ControlBasis, Converter={x:Static cv:BasisToRangeConverter.Instance}, Mode=OneWay}" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Control slider -->
+                <DataGridTemplateColumn Width="180" MinWidth="150" CanUserReorder="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanControlSettingCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanControlSettingTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  Margin="8,0"
+                                  IsEnabled="{Binding FanState.OperationMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanOperationMode.OperationManual}}">
+                                <lc:CompactSlider Grid.Column="0"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        SmallChange="0.01"
+                                        Value="{Binding ControlValue}"
+                                        VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="deactivatable"
+                                           Width="50"
+                                           TextAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="4,0,0,0"
+                                           Text="{Binding ControlValue, Converter={x:Static cv:DoubleToPercentConverter.Instance}, Mode=OneWay}" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Control bar indicator -->
+                <DataGridTemplateColumn Width="90" MinWidth="90" CanUserReorder="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanControlValueCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanControlValueTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <Grid Margin="4,0"
+                                  x:Name="PowerBarContainer">
+
+                                <!-- Background track -->
+                                <Border CornerRadius="3"
+                                        Height="16"
+                                        Background="{DynamicResource SystemBaseLowColor}"
+                                        HorizontalAlignment="Stretch" />
+
+                                <!-- Filled bar -->
+                                <Border CornerRadius="3"
+                                        Height="16"
+                                        HorizontalAlignment="Left"
+                                        Background="{DynamicResource SystemBaseMediumColor}">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{x:Static cv:PercentBarWidthConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="FanState.ScaledControl" />
+                                            <Binding Path="Bounds.Width"
+                                                     ElementName="PowerBarContainer" />
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
+
+                                <!-- Percentage text overlay -->
+                                <TextBlock Text="{Binding FanState.ScaledControl, Converter={x:Static cv:DoubleToPercentConverter.Instance}, Mode=OneWay}"
+                                           FontSize="11"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Voltage -->
+                <DataGridTextColumn Width="90"
+                                    MinWidth="90"
+                                    CanUserReorder="True"
+                                    CanUserResize="False"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                            <Binding Path="FanState.CurrentVoltage"/>
+                            <ReflectionBinding Path="[VoltageParameterShortFormat]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanVoltageCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanVoltageTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- RPM indicator -->
+                <DataGridTemplateColumn Width="140" MinWidth="100" CanUserReorder="True">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderFanSpeedCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderFanSpeedTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <Grid Margin="4,0"
+                                  x:Name="RpmBarContainer">
+
+                                <!-- Background track -->
+                                <Border CornerRadius="3"
+                                        Height="16"
+                                        Background="{DynamicResource SystemBaseLowColor}"
+                                        HorizontalAlignment="Stretch" />
+
+                                <!-- Just the container for calculated RPM percentage -->
+                                <ContentControl x:Name="RpmPercentage" IsVisible="False">
+                                    <ContentControl.Content>
+                                        <MultiBinding Converter="{x:Static cv:PpmToPercentConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="FanState.CurrentPPM" />
+                                            <Binding Path="CurrentMinPpm" />
+                                            <Binding Path="FanConfig.MaxPPM" />
+                                        </MultiBinding>
+                                    </ContentControl.Content>
+                                </ContentControl>
+
+                                <!-- Filled bar -->
+                                <Border CornerRadius="3"
+                                        Height="16"
+                                        HorizontalAlignment="Left"
+                                        Background="{Binding #RpmPercentage.Content,
+                                            Converter={x:Static cv:PercentToColorConverter.Instance}, Mode=OneWay}">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{x:Static cv:PercentBarWidthConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="Content" ElementName="RpmPercentage" />
+                                            <Binding Path="Bounds.Width" ElementName="RpmBarContainer" />
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
+
+                                <!-- RPM text overlay -->
+                                <TextBlock FontSize="11"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}" StringFormat='{}{0}' Mode="OneWay">
+                                            <Binding Path="FanState.CurrentPPM" />
+                                            <Binding Path="FanConfig.OptionPpr" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Fan row menu -->
+                <DataGridTemplateColumn Width="40"
+                                        CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:FanItem">
+                            <Button Classes="menuButton"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+
+                                        <!-- Open Details window -->
+                                        <MenuItem Header="{lz:Localize MenuDetailsCaption}"
+                                                  Click="OnDetailsClick"/>
+
+                                        <Separator />
+
+                                        <!-- Reset State -->
+                                        <MenuItem Header="{lz:Localize MenuResetFanCaption}"
+                                                  Click="OnResetStateClick"/>
+
+                                        <Separator />
+
+                                        <!-- Control Mode -->
+                                        <MenuItem Header="{lz:Localize FanControlModeParameterFullName}">
+                                            <MenuItem Header="{lz:Localize FanControlModeControlDisabledValue}"
+                                                      Click="OnControlModeClick"
+                                                      Tag="{x:Static ct:FanControlMode.ControlDisabled}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.ControlMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanControlMode.ControlDisabled},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanControlModeControlPWMValue}"
+                                                      Click="OnControlModeClick"
+                                                      Tag="{x:Static ct:FanControlMode.ControlPWM}"
+                                                      ToggleType="CheckBox"                                                  
+                                                      IsChecked="{Binding FanState.ControlMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanControlMode.ControlPWM},
+                                                              Mode=OneWay}"
+                                                      IsEnabled="{Binding FanConfig.ModelPwmRangeDetected}" />
+                                            <MenuItem Header="{lz:Localize FanControlModeControlDCDCValue}"
+                                                      Click="OnControlModeClick"
+                                                      Tag="{x:Static ct:FanControlMode.ControlDCDC}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.ControlMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanControlMode.ControlDCDC},
+                                                              Mode=OneWay}"
+                                                      IsEnabled="{Binding FanConfig.ModelDcdcRangeDetected}" />
+                                            <MenuItem Header="{lz:Localize FanControlModeControlONOFFValue}"
+                                                      Click="OnControlModeClick"
+                                                      Tag="{x:Static ct:FanControlMode.ControlONOFF}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.ControlMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanControlMode.ControlONOFF},
+                                                              Mode=OneWay}"
+                                                      IsEnabled="{Binding FanConfig.HardwareMosfetAvailable}" />
+                                        </MenuItem>
+
+                                        <!-- Operation Mode -->
+                                        <MenuItem Header="{lz:Localize FanOperationModeParameterFullName}">
+                                            <MenuItem Header="{lz:Localize FanOperationModeOperationNormalValue}"
+                                                      Click="OnOperationModeClick"
+                                                      Tag="{x:Static ct:FanOperationMode.OperationNormal}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.OperationMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanOperationMode.OperationNormal},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanOperationModeOperationManualValue}"
+                                                      Click="OnOperationModeClick"
+                                                      Tag="{x:Static ct:FanOperationMode.OperationManual}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.OperationMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanOperationMode.OperationManual},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanOperationModeOperationSilentValue}"
+                                                      Click="OnOperationModeClick"
+                                                      Tag="{x:Static ct:FanOperationMode.OperationSilent}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.OperationMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanOperationMode.OperationSilent},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanOperationModeOperationTurboValue}"
+                                                      Click="OnOperationModeClick"
+                                                      Tag="{x:Static ct:FanOperationMode.OperationTurbo}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding FanState.OperationMode,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static ct:FanOperationMode.OperationTurbo},
+                                                              Mode=OneWay}" />
+                                        </MenuItem>
+
+                                        <!-- Power Profile -->
+                                        <MenuItem Header="{lz:Localize FanPowerProfileParameterShortName}">
+                                            <MenuItem Header="{lz:Localize FanPowerProfileProfileEasyValue}"
+                                                      Click="OnPowerProfileClick"
+                                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileEasy}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding PowerProfile,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static vm:FanItem+FanPowerProfile.ProfileEasy},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanPowerProfileProfileChillValue}"
+                                                      Click="OnPowerProfileClick"
+                                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileChill}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding PowerProfile,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static vm:FanItem+FanPowerProfile.ProfileChill},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanPowerProfileProfileNormalValue}"
+                                                      Click="OnPowerProfileClick"
+                                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileNormal}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding PowerProfile,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static vm:FanItem+FanPowerProfile.ProfileNormal},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanPowerProfileProfileBusyValue}"
+                                                      Click="OnPowerProfileClick"
+                                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileBusy}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding PowerProfile,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static vm:FanItem+FanPowerProfile.ProfileBusy},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanPowerProfileProfileHardValue}"
+                                                      Click="OnPowerProfileClick"
+                                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileHard}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding PowerProfile,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static vm:FanItem+FanPowerProfile.ProfileHard},
+                                                              Mode=OneWay}" />
+                                            <MenuItem Header="{lz:Localize FanPowerProfileProfileCustomValue}"
+                                                      Click="OnPowerProfileClick"
+                                                      Tag="{x:Static vm:FanItem+FanPowerProfile.ProfileCustom}"
+                                                      ToggleType="CheckBox"
+                                                      IsChecked="{Binding PowerProfile,
+                                                              Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                              ConverterParameter={x:Static vm:FanItem+FanPowerProfile.ProfileCustom},
+                                                              Mode=OneWay}" />
+                                        </MenuItem>
+                                    
+                                        <Separator />
+                                    
+                                        <MenuItem Header="{lz:Localize MenuRescanHardwareCaption}"
+                                            Click="OnRescanHardwareClick" />
+                                    
+                                        <MenuItem Header="{lz:Localize MenuRescanFanCaption}"
+                                            Click="OnRescanModelClick" />
+
+                                    </MenuFlyout>
+                                </Button.Flyout>
+
+                                <!-- Three dots icon -->
+                                <PathIcon Data="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"
+                                          Width="16" Height="16" />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+
+        <!-- Status Indicators row -->
+        <Grid Grid.Row="3" VerticalAlignment="Bottom" 
+              IsVisible="{Binding HasCurrentFan}" 
+              Margin="0,5,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="6*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Row="0" Grid.Column="0"
+                    Margin="10,0,5,0"
+                    CornerRadius="10">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                     Opacity="0.33"/>
+                </Border.Background>
+
+                <StackPanel Orientation="Vertical">
+                    
+                    <TextBlock Text="{lz:Localize SectionFanPropertiesName}"
+                               FontSize="11"
+                               HorizontalAlignment="Center"
+                               Margin="0,4,0,2"
+                               Opacity="0.4"/>
+
+                    <Grid Margin="0,0,0,5"
+                          HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>   
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Column="0" 
+                                Grid.RowSpan="5" 
+                                BorderThickness="0,0,1,0" 
+                                BorderBrush="{DynamicResource SystemBaseLowColor}">
+                        </Border>
+
+                        <!-- Hardware PWM Available -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="0" 
+                                        Text="{lz:Localize FanPwmHardwareParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.HardwarePwmAvailable, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                                        ToolTip.Tip="{lz:Localize FanPwmHardwareParameterTip}" />
+
+                        <!-- Hardware TACH Available -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="0" 
+                                        Text="{lz:Localize FanTachometerHardwareParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.HardwareRpmAvailable, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                                        ToolTip.Tip="{lz:Localize FanTachometerHardwareParameterTip}" />
+
+                        <!-- Hardware Voltmeter Available -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="0" 
+                                        Text="{lz:Localize FanVoltmeterHardwareParameterShortName}" 
+                                        FontSize="11"
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.HardwareVoltmeterAvailable, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                                        ToolTip.Tip="{lz:Localize FanVoltmeterHardwareParameterTip}" />
+
+                        <!-- Hardware MOSFET Available -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="0" 
+                                        Text="{lz:Localize FanMosfetHardwareParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.HardwareMosfetAvailable, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                                        ToolTip.Tip="{lz:Localize FanMosfetHardwareParameterTip}" />
+
+                        <!-- Hardware DCDC Available -->
+                        <lc:StatusLabel Grid.Row="4" Grid.Column="0" 
+                                        Text="{lz:Localize FanDcdcHardwareParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.HardwareDcdcAvailable, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                                        ToolTip.Tip="{lz:Localize FanDcdcHardwareParameterTip}" />
+
+
+                        <!-- Fan Name -->
+                        <!--
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="1" 
+                                        Text="{Binding CurrentFan?.FanConfig?.Name, 
+                                                FallbackValue='-',
+                                                TargetNullValue='-', 
+                                                Mode=OneWay}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        FontWeight="Bold"
+                                        IsActive="True" 
+                                        Foreground="{DynamicResource GlobalInfo}" 
+                                        ToolTip.Tip="{lz:Localize FanNameParameterTip}" />
+                        -->
+                        <!-- 4-Wire Fan Detected -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="1" 
+                                        Text="{lz:Localize FanPwmParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelPwm, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwmParameterTip}" />
+
+                        <!-- 3-Wire Fan Detected -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="1" 
+                                        Text="{lz:Localize FanTachometerParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelTachometer, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanTachometerParameterTip}" />
+
+                        <!-- Connected Fan Detected (2 wires and more) -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="1" 
+                                        Text="{lz:Localize FanConnectedParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelConnected, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanConnectedParameterTip}" />
+
+                        <!-- The tachometer is functional at zero PWM -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="1" 
+                                        Text="{lz:Localize FanPwmFreewheelTachometerParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelPwmFreewheelTachometer, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwmFreewheelTachometerParameterTip}" />
+
+                        <!-- Always ON Option -->
+                        <lc:StatusLabel Grid.Row="4" Grid.Column="1" 
+                                        Text="{lz:Localize FanAlwaysOnParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.OptionAlwaysOn, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanAlwaysOnParameterTip}" />
+
+
+                        <!-- Tachometer Pulses Per Revolution -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="2" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding HasCurrentFan}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPprParameterShortTip}">
+                                <lc:StatusLabel.Text>
+                                    <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}"
+                                                  Mode="OneWay">
+                                        <Binding Path="CurrentFan?.FanConfig?.OptionPpr" />
+                                        <ReflectionBinding Path="[FanPprParameterShortFormat]"
+                                                           Source="{x:Static lz:LocalizationService.Instance}"/>
+                                    </MultiBinding>
+                                </lc:StatusLabel.Text>
+                            </lc:StatusLabel>
+
+                        <!-- Maximum Fan Speed -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="2"
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding HasCurrentFan}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanMaxSpeedParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                              Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.MaxPPM" />
+                                    <Binding Path="CurrentFan?.FanConfig?.OptionPpr" />
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelTachometer" />
+                                    <ReflectionBinding Path="[FanMaxSpeedParameterShortFormat]"
+                                                       Source="{x:Static lz:LocalizationService.Instance}"/>
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Sub-maximum Fan Speed (PWM only) -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="2" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelPwmExcessiveFullSpeed, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPenultimateSpeedParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                              Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.PwmPenultimatePpm" />
+                                    <Binding Path="CurrentFan?.FanConfig?.OptionPpr" />
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelPwmExcessiveFullSpeed" />
+                                    <ReflectionBinding Path="[FanPenultimateSpeedParameterShortFormat]"
+                                                       Source="{x:Static lz:LocalizationService.Instance}"/>
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- PWM-Controlled Minimum Fan Speed -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="2" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelPwmRangeDetected, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwmMinSpeedParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                              Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.PwmControlledMinPpm" />
+                                    <Binding Path="CurrentFan?.FanConfig?.OptionPpr" />
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelPwmRangeDetected" />
+                                    <ReflectionBinding Path="[FanPwmMinSpeedParameterShortFormat]"
+                                                       Source="{x:Static lz:LocalizationService.Instance}"/>
+                                </MultiBinding>
+
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Power-Controlled (DC-DC) Minimum Fan Speed -->
+                        <lc:StatusLabel Grid.Row="4" Grid.Column="2" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelDcdcRangeDetected, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwrMinSpeedParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                              Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.PwrControlledMinPpm" />
+                                    <Binding Path="CurrentFan?.FanConfig?.OptionPpr" />
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelDcdcRangeDetected" />
+                                    <ReflectionBinding Path="[FanPwrMinSpeedParameterShortFormat]"
+                                                       Source="{x:Static lz:LocalizationService.Instance}"/>
+                                </MultiBinding>
+
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+                
+
+                        <!-- PID Enabled for PWM Control Mode -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="3" 
+                                        Text="{lz:Localize FanPwmPidEnabledParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.OptionPidEnabledPwm, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwmPidEnabledParameterTip}" />
+
+                        <!-- PID Enabled for DC-DC Control Mode -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="3" 
+                                        Text="{lz:Localize FanPwrPidEnabledParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.OptionPidEnabledPwr, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwrPidEnabledParameterTip}" />
+
+                        <!-- Configured slow PID response in PWM Control Mode -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="3" 
+                                        Text="{lz:Localize FanPwmPidSlowParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.OptionPidSlowPwm, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwmPidSlowParameterTip}" />
+
+                        <!-- Configured slow PID response in DC-DC Control Mode -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="3" 
+                                        Text="{lz:Localize FanPwrPidSlowParameterShortName}" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.OptionPidSlowPwr, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwrPidSlowParameterTip}" />
+
+                        <!-- Control Value Rate-Of-Change Fan Parameter -->
+                        <lc:StatusLabel Grid.Row="4" Grid.Column="3" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding HasCurrentFan}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanRocParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                              FallbackValue="-"
+                                              TargetNullValue="-"
+                                              Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.OptionRoc" />
+                                    <Binding Source="ShortValue" />
+                                    <Binding Source="ShortFormat" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+
+                        <!-- Fan Spin-up power percentage for PWM Control Mode -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="4" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelPwmRangeDetected, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwmSpinParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                              FallbackValue="-"
+                                              TargetNullValue="-"
+                                              Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.OptionSpinPowerPwm" />
+                                    <Binding Source="ShortValue" />
+                                    <Binding Source="ShortFormatPWM" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Fan Spin-up power percentage for DC-DC Control Mode -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="4" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelDcdcRangeDetected, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False, 
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPwrSpinParameterTip}">
+                                <lc:StatusLabel.Text>
+                                    <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                  FallbackValue="-"
+                                                  TargetNullValue="-"
+                                                  Mode="OneWay">
+                                        <Binding Path="CurrentFan?.FanConfig?.OptionSpinPowerPwr" />
+                                        <Binding Source="ShortValue" />
+                                        <Binding Source="ShortFormatPWR" />
+                                    </MultiBinding>
+                                </lc:StatusLabel.Text>
+                            </lc:StatusLabel>
+
+                        <!-- Detected Fan Size (experimental) -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="4" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelSize,
+                                            Converter={x:Static cv:EnumEqualConverter.NotInstance},
+                                            ConverterParameter={x:Static ct:FanModelSize.SizeUnknown},
+                                            FallbackValue=False,
+                                            TargetNullValue=False,
+                                            Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanSizeParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                FallbackValue="-"
+                                                TargetNullValue="-"
+                                                Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelSize" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Detected Fan Power (experimental) -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="4" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelPower,
+                                                Converter={x:Static cv:EnumEqualConverter.NotInstance},
+                                                ConverterParameter={x:Static ct:FanModelPower.PowerUnknown},
+                                                FallbackValue=False,
+                                                TargetNullValue=False,
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanPowerParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                FallbackValue="-"
+                                                TargetNullValue="-"
+                                                Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelPower" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Detected Fan Class (experimental) -->
+                        <lc:StatusLabel Grid.Row="4" Grid.Column="4" 
+                                        FontSize="11" 
+                                        Padding="20,0"
+                                        Margin="0,4"
+                                        Height="16"
+                                        IsActive="{Binding CurrentFan?.FanConfig?.ModelClass,
+                                                Converter={x:Static cv:EnumEqualConverter.NotInstance},
+                                                ConverterParameter={x:Static ct:FanModelClass.ClassUnknown},
+                                                FallbackValue=False,
+                                                TargetNullValue=False,
+                                                Mode=OneWay}" 
+                                        Foreground="{DynamicResource GlobalInfo}"
+                                        ToolTip.Tip="{lz:Localize FanClassParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                FallbackValue="-"
+                                                TargetNullValue="-"
+                                                Mode="OneWay">
+                                    <Binding Path="CurrentFan?.FanConfig?.ModelClass" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <Border Grid.Row="0" Grid.Column="1"
+                    Margin="5,0,10,0"
+                    CornerRadius="10">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                     Opacity="0.33"/>
+                </Border.Background>
+
+                <StackPanel Orientation="Vertical">
+                    
+                <TextBlock Text="{lz:Localize SectionFanStatusName}"
+                            FontSize="11"
+                            HorizontalAlignment="Center"
+                            Margin="0,4,0,2"
+                            Opacity="0.4"/>
+
+                <Grid Margin="0,0,0,5"
+                      HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- PWM Hardware Error -->
+                    <lc:StatusLabel Grid.Row="0" Grid.Column="0"
+                                    Text="{lz:Localize FanStatusPwmHardwareErrorShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusHWErrorPWM,
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusPwmHardwareErrorTip}" />
+
+                    <!-- Tachometer Hardware Error -->
+                    <lc:StatusLabel Grid.Row="1" Grid.Column="0" 
+                                    Text="{lz:Localize FanStatusTachometerHardwareErrorShortName}" 
+                                    FontSize="11"
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusHWErrorTACH, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                            Background="{DynamicResource StatusError}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusTachometerHardwareErrorTip}" />
+                
+                    <!-- Voltmeter Hardware Error -->
+                    <lc:StatusLabel Grid.Row="2" Grid.Column="0" 
+                                    Text="{lz:Localize FanStatusVoltmeterHardwareErrorShortName}" 
+                                    FontSize="11"
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusHWErrorVoltmeter, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusVoltmeterHardwareErrorTip}" />
+                
+                    <!-- MOSFET Hardware Error -->
+                    <lc:StatusLabel Grid.Row="3" Grid.Column="0" 
+                                    Text="{lz:Localize FanStatusMosfetHardwareErrorShortName}" 
+                                    FontSize="11"
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusHWErrorMOSFET, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusMosfetHardwareErrorTip}"/>
+                
+                    <!-- DC-DC Hardware Error -->
+                    <lc:StatusLabel Grid.Row="4" Grid.Column="0" 
+                                    Text="{lz:Localize FanStatusDcdcHardwareErrorShortName}" 
+                                    FontSize="11"
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusHWErrorDCDC, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}"
+                                    ToolTip.Tip="{lz:Localize FanStatusDcdcHardwareErrorTip}"/>
+
+
+                    <!-- Low Fan Speed -->
+                    <lc:StatusLabel Grid.Row="0" Grid.Column="1" 
+                                    Text="{lz:Localize FanStatusLowSpeedShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusWarningPPM, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusWarning}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusLowSpeedTip}"/>
+
+                    <!-- Critically Low Fan Speed -->
+                    <lc:StatusLabel Grid.Row="1" Grid.Column="1" 
+                                    Text="{lz:Localize FanStatusCriticallyLowSpeedShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusAlarmPPM, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusCriticallyLowSpeedTip}" />
+                
+                    <!-- Low Power Supply Voltage -->
+                    <lc:StatusLabel Grid.Row="2" Grid.Column="1" 
+                                    Text="{lz:Localize FanStatusLowPowerShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusWarningPWR, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusWarning}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusLowPowerTip}"/>
+                
+                    <!-- Critically Low Power Supply Voltage -->
+                    <lc:StatusLabel Grid.Row="3" Grid.Column="1" 
+                                    Text="{lz:Localize FanStatusCriticallyLowPowerShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusAlarmPWR, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusCriticallyLowPowerTip}"/>
+
+                    <!-- Fan Fatal Failure -->
+                    <lc:StatusLabel Grid.Row="4" Grid.Column="1" 
+                                    Text="{lz:Localize FanStatusFatalFailureShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusFatalFailure, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}"
+                                    ToolTip.Tip="{lz:Localize FanStatusFatalFailureTip}"/>
+
+
+
+
+                    <!-- Fan Spinning Up -->
+                    <lc:StatusLabel Grid.Row="0" Grid.Column="2" 
+                                    Text="{lz:Localize FanStatusSpinningUpShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusSpinningUp, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusNormal}"
+                                    ToolTip.Tip="{lz:Localize FanStatusSpinningUpTip}" />
+
+                    <!-- Fan Warming -->
+                    <lc:StatusLabel Grid.Row="1" Grid.Column="2" 
+                                    Text="{lz:Localize FanStatusWarmingShortName}" 
+                                    FontSize="11"
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.StatusWarming, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusBusy}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusWarmingTip}"/>
+                
+                    <!-- PID Temporary Suspended -->
+                    <lc:StatusLabel Grid.Row="2" Grid.Column="2" 
+                                    Text="{lz:Localize FanStatusPidSuspendedShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusPIDSuspended, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusSuspended}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusPidSuspendedTip}"/>
+                
+                    <!-- PID Action Required -->
+                    <lc:StatusLabel Grid.Row="3" Grid.Column="2" 
+                                    Text="{lz:Localize FanStatusActionRequiredShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusPIDActionRequired, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusBusy}"
+                                    ToolTip.Tip="{lz:Localize FanStatusActionRequiredTip}"/>
+
+                    <!-- Spin Up Failed -->
+                    <lc:StatusLabel Grid.Row="4" Grid.Column="2" 
+                                    Text="{lz:Localize FanStatusSpinUpFailedShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusSpinUpFailed, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}"
+                                    ToolTip.Tip="{lz:Localize FanStatusSpinUpFailedTip}"/>
+
+
+                    <!-- Fan Running -->
+                    <lc:StatusLabel Grid.Row="0" Grid.Column="3" 
+                                    Text="{lz:Localize FanStatusRunningShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusRunning, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusNormal}"
+                                    ToolTip.Tip="{lz:Localize FanStatusRunningTip}"/>
+
+                    <!-- Fan Scanning (Hardware or Model) -->
+                    <lc:StatusLabel Grid.Row="1" Grid.Column="3" 
+                                    Text="{lz:Localize FanStatusScanningShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusScanning, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusAction}"
+                                    ToolTip.Tip="{lz:Localize FanStatusScanningTip}"/>
+
+                    <!-- Fan Halted -->
+                    <lc:StatusLabel Grid.Row="2" Grid.Column="3" 
+                                    Text="{lz:Localize FanStatusHaltedShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusHalted, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusSuspended}" 
+                                    ToolTip.Tip="{lz:Localize FanStatusHaltedTip}"/>
+                
+                    <!-- Fan Switched Off -->
+                    <lc:StatusLabel Grid.Row="3" Grid.Column="3" 
+                                    Text="{lz:Localize FanStatusSwitchedOffShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusSwitchedOff, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusUnavailable}"
+                                    ToolTip.Tip="{lz:Localize FanStatusSwitchedOffTip}"/>
+
+                    <!-- Fan Failed -->
+                    <lc:StatusLabel Grid.Row="4" Grid.Column="3" 
+                                    Text="{lz:Localize FanStatusFailedShortName}" 
+                                    FontSize="11" 
+                                    Padding="20,0"
+                                    Margin="5,4"
+                                    CornerRadius="8"
+                                    Height="16"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{Binding CurrentFan?.FanState?.StatusFailed, 
+                                            FallbackValue=False,
+                                            TargetNullValue=False, 
+                                            Mode=OneWay}" 
+                                    Background="{DynamicResource StatusError}"
+                                    ToolTip.Tip="{lz:Localize FanStatusFailedTip}"/>
+
+
+                </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,17 @@
+# Repository-wide patterns only. The firmware and the software have their own
+# .gitignore files in their folders.
+
+# Working notes (not part of the project)
+HANDOFF-*.md
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editors and temporary files
+.vscode/
+*.tmp
+*.swp
+*~

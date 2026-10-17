@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanController", "FanController\FanController.csproj", "{D3E29953-5071-492F-9E79-18D9B1F35C82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanController.Contracts", "FanController.Contracts\FanController.Contracts.csproj", "{9C7B3DD2-C4C3-4510-95AB-3A11D1AD02FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanController.Service", "FanController.Service\FanController.Service.csproj", "{A1BD0486-19C4-4BAE-8228-7D0CF9E6EB82}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{00D4DF67-A356-4C38-8B61-81CAEF84C43F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		CONTRIBUTING.md = CONTRIBUTING.md
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		LICENSE = LICENSE
+		Build\LinuxPackage.targets = Build\LinuxPackage.targets
+		README.md = README.md
+		SECURITY.md = SECURITY.md
+		THIRD-PARTY-NOTICES.md = THIRD-PARTY-NOTICES.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3E29953-5071-492F-9E79-18D9B1F35C82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3E29953-5071-492F-9E79-18D9B1F35C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3E29953-5071-492F-9E79-18D9B1F35C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3E29953-5071-492F-9E79-18D9B1F35C82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C7B3DD2-C4C3-4510-95AB-3A11D1AD02FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C7B3DD2-C4C3-4510-95AB-3A11D1AD02FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C7B3DD2-C4C3-4510-95AB-3A11D1AD02FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C7B3DD2-C4C3-4510-95AB-3A11D1AD02FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1BD0486-19C4-4BAE-8228-7D0CF9E6EB82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1BD0486-19C4-4BAE-8228-7D0CF9E6EB82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1BD0486-19C4-4BAE-8228-7D0CF9E6EB82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1BD0486-19C4-4BAE-8228-7D0CF9E6EB82}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {749C0F72-CB1F-4D91-9FD0-F226CF2D12B2}
+	EndGlobalSection
+EndGlobal

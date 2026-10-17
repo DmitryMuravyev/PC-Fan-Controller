@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lz="using:FanController.Localization"
+        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="200"
+        x:Class="FanController.Views.ConfirmDialog"
+        Title="{lz:Localize DialogConfirmTitle}"
+        Width="360"
+        SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        WindowDecorations="BorderOnly">
+
+    <Border Padding="10" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1" CornerRadius="5">
+        <StackPanel Spacing="20">
+
+            <!-- Header -->
+            <TextBlock x:Name="HeaderText"
+                       FontWeight="Bold"
+                       TextWrapping="Wrap"
+                       FontSize="16" />
+
+            <!-- Message (long texts scroll; selectable, e.g. to copy error details) -->
+            <ScrollViewer MaxHeight="400"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <SelectableTextBlock x:Name="MessageText"
+                                     TextWrapping="Wrap"
+                                     FontSize="14" />
+            </ScrollViewer>
+
+            <!-- Buttons (Enter: Continue, Escape: Cancel - see code-behind) -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="10">
+                <Button x:Name="CancelButton"
+                        Content="{lz:Localize ButtonCancelCaption}"
+                        HorizontalContentAlignment="Center"
+                        Width="90"
+                        Click="OnCancelClick" />
+                <Button x:Name="ContinueButton"
+                        Content="{lz:Localize ButtonContinueCaption}"
+                        HorizontalContentAlignment="Center"
+                        Width="90"
+                        Classes="accent"
+                        IsDefault="True"
+                        Click="OnContinueClick" />
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</Window>

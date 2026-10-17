@@ -1,0 +1,816 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:lc="using:FanController.Controls"
+        xmlns:lv="using:FanController.Views"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FanController.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        MinWidth="1300" 
+        MinHeight="800"
+        Width="1300"
+        Height="800">
+
+        <!-- For the Windows OS we can use TitleBar to display custom menu, overall state color and so on...
+             Since this project is cross-platform, I will not use this feature, but I will save the code for the future. -->
+        <!--
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        TransparencyLevelHint="None"
+        -->
+
+    <Window.Title>
+        <MultiBinding Converter="{x:Static cv:StatusTitleConverter.Instance}">
+            <!-- I'll use MultiValueConverter with single parameter for future expansion of functionality -->
+            <Binding Path="IsSelectedDeviceOnline" />
+        </MultiBinding>
+    </Window.Title>
+
+    <Window.Icon>
+        <MultiBinding Converter="{x:Static cv:StatusIconConverter.Instance}">
+            <Binding Path="SelectedDeviceOverallState" />
+        </MultiBinding>
+    </Window.Icon>
+
+    <!-- Parent Grid -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- <RowDefinition Height="30"/> -->
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Custom TitleBar -->
+        <!-- 
+        <StackPanel DockPanel.Dock="Top" 
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal" 
+                    Background="{Binding OverallStatusColor}"
+                    Margin="{Binding WindowState,
+                          RelativeSource={RelativeSource AncestorType=Window},
+                          Converter={x:Static cv:MaximizedPaddingConverter.Instance}}"
+                    PointerPressed="TitleBar_PointerPressed"
+                    DoubleTapped="TitleBar_DoubleTapped">
+            <Menu VerticalAlignment="Center" IsHitTestVisible="True" Margin="0,0">
+                <MenuItem>
+                    <MenuItem.Header>
+                        <Image Source="/Assets/avalonia-logo.ico" 
+                            Width="18" 
+                            Height="18" 
+                            RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                    </MenuItem.Header>
+                    <MenuItem Header="Theme..."/>
+                    <Separator/>
+                    <MenuItem Header="Exit"/>
+                </MenuItem>
+            </Menu>
+            <TextBlock Text="{Binding ApplicationStatusTitle}"
+                        FontWeight="Light"
+                        VerticalAlignment="Center" 
+                        Margin="0,0" 
+                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                        IsHitTestVisible="False"/>
+        </StackPanel>
+        -->
+
+        <!-- Main tabs -->
+        <lc:BusyTabControl x:Name="MainTabControl" Grid.Row="0" 
+                           IsContentEnabled="{Binding IsSelectedDeviceOnline}" 
+                           IsBusy="{Binding IsSelectedDeviceBusy}" 
+                           BusyMessage="{Binding SelectedDeviceBusyMessage}"
+                           BusyPercentage="{Binding SelectedDeviceBusyProgress}"
+                           IsIndeterminate="{Binding SelectedDeviceProgressIndeterminate}">
+            <TabItem Header="{lz:Localize TabFansCaption}">
+                <lv:FanView DataContext="{Binding Fans}" />
+            </TabItem>
+            <TabItem Header="{lz:Localize TabSensorsCaption}">
+                <lv:SensorView DataContext="{Binding Sensors}" />
+            </TabItem>
+            <TabItem Header="{lz:Localize TabSystemCaption}">
+                <lv:SystemView DataContext="{Binding System}" />
+            </TabItem>
+        </lc:BusyTabControl>
+
+        <!-- Controller selection: overlays the right end of the tab header row -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,10,10,0" Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" 
+                       FontWeight="Bold" 
+                       Margin="0,0,10,0"
+                       Text="{lz:Localize ControllerSelectionCaption}" />
+            <!-- Mode=OneWayToSource}" -->
+            <ComboBox ItemsSource="{Binding Devices}" 
+                      SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
+                      PlaceholderText="{lz:Localize ControllerSelectionPlaceholderCaption}" 
+                      MaxWidth="650">
+                <ComboBox.Background>
+                    <MultiBinding Converter="{x:Static cv:DeviceConnectedColorConverter.Instance}">
+                        <!-- I'll use MultiValueConverter with single parameter for future expansion of functionality -->
+                        <Binding Path="IsSelectedDeviceOnline" />
+                    </MultiBinding>
+                </ComboBox.Background>
+                <!-- Item template for the found Controllers -->
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:DeviceItem">
+                        <TextBlock Text="{Binding DisplayName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <!-- Setter for disconnected Controller state -->
+                <ComboBox.Styles>
+                    <Style Selector="ComboBoxItem" x:DataType="vm:DeviceItem">
+                        <Setter Property="IsEnabled" Value="{Binding IsAvailableOverall}" />
+                    </Style>
+                </ComboBox.Styles>
+            </ComboBox>
+
+            <!-- Configure Hosts button -->
+            <Button Classes="iconButton"
+                    Click="OnConfigureHostsClick"
+                    Width="32" 
+                    Height="32" 
+                    Margin="8,0,0,0"
+                    ToolTip.Tip="{lz:Localize ButtonConfigureHostsTip}" >
+                <ContentControl Content="{StaticResource SettingsIcon}"/>
+            </Button>
+        </StackPanel>
+
+
+        <!-- Controller State block -->      
+        <Grid Grid.Row="1"
+                Margin="0,5,0,10">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="160*" />
+                <ColumnDefinition Width="300*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Controller Metrics -->
+            <Border Grid.Column="0"
+                    Margin="10,0,5,0"
+                    CornerRadius="10">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                     Opacity="0.33"/>
+                </Border.Background>
+
+                <StackPanel Orientation="Vertical">
+                    
+                    <TextBlock Text="{lz:Localize SectionControllerMetricsName}"
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                Margin="0,4,0,2"
+                                Opacity="0.4"/>
+
+                    <!-- Controller Metrics subgrid -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="70" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Fans Power Voltage -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerHighPowerParameterShortName}" 
+                                        FontSize="13" 
+                                        Padding="0,0,5,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        TextAlignment="Right" 
+                                        IsActive="{Binding SystemState.StatusAlarmPower, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}"
+                                        InactiveBackgroundOpacity="0.0" 
+                                        InactiveTextOpacity="1.0" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerHighPowerParameterTip}" />
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="1" 
+                                        FontSize="13"
+                                        Padding="5,0,0,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        Placeholder="-" 
+                                        TextAlignment="Left" 
+                                        IsActive="{Binding SystemState.StatusAlarmPower, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        InactiveBackgroundOpacity="0.0" 
+                                        InactiveTextOpacity="1.0" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerHighPowerParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                    <Binding Path="SystemState.HighLoadPowerBusVoltage"/>
+                                    <ReflectionBinding Path="[VoltageParameterShortFormat]"
+                                                        Source="{x:Static lz:LocalizationService.Instance}"/>
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Digital Power Supply circuit Voltage -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerDigitalPowerParameterShortName}" 
+                                        FontSize="13"
+                                        Padding="0,0,5,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        TextAlignment="Right" 
+                                        IsActive="True" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerDigitalPowerParameterTip}" />
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="1"
+                                        FontSize="13"
+                                        Padding="5,0,0,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        Placeholder="-"
+                                        TextAlignment="Left"
+                                        IsActive="False"
+                                        Background="{DynamicResource StatusError}"
+                                        InactiveBackgroundOpacity="0.0"
+                                        InactiveTextOpacity="1.0"
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerDigitalPowerParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                    <Binding Path="SystemState.DigitalPowerBusVoltage"/>
+                                    <ReflectionBinding Path="[VoltageParameterShortFormat]"
+                                                        Source="{x:Static lz:LocalizationService.Instance}"/>
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- MCU Vdd voltage -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerMcuPowerParameterShortName}" 
+                                        FontSize="13"
+                                        Padding="0,0,5,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        TextAlignment="Right" 
+                                        IsActive="True" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerMcuPowerParameterTip}" />
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="1"
+                                        FontSize="13"
+                                        Padding="5,0,0,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        Placeholder="-"
+                                        TextAlignment="Left"
+                                        IsActive="False"
+                                        Background="{DynamicResource StatusError}"
+                                        InactiveBackgroundOpacity="0.0"
+                                        InactiveTextOpacity="1.0"
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerMcuPowerParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                    <Binding Path="SystemState.McuPowerBusVoltage"/>
+                                    <ReflectionBinding Path="[VoltageParameterShortFormat]"
+                                                        Source="{x:Static lz:LocalizationService.Instance}" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+
+                        <!-- Available Free RAM Size -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerFreeRamParameterShortName}" 
+                                        FontSize="13"
+                                        Padding="0,0,5,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        TextAlignment="Right" 
+                                        IsActive="{Binding SystemState.StatusAlarmLowRam, Mode=OneWay}"
+                                        Background="{DynamicResource StatusError}" 
+                                        InactiveBackgroundOpacity="0.0" 
+                                        InactiveTextOpacity="1.0" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerFreeRamParameterTip}" />
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="1"
+                                        FontSize="13"
+                                        Padding="5,0,0,0"
+                                        Margin="0,4"
+                                        Height="20"
+                                        Placeholder="-"
+                                        TextAlignment="Left"
+                                        IsActive="{Binding SystemState.StatusAlarmLowRam, Mode=OneWay}"
+                                        Background="{DynamicResource StatusError}" 
+                                        InactiveBackgroundOpacity="0.0" 
+                                        InactiveTextOpacity="1.0" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerFreeRamParameterTip}">
+                            <lc:StatusLabel.Text>
+                                <MultiBinding Converter="{x:Static cv:BytesConverter.Instance}">
+                                    <Binding Path="SystemState.FreeRAM"/>
+                                    <Binding Source="1024" />
+                                    <ReflectionBinding Path="[MemorySizeParameterShortFormat]"
+                                                        Source="{x:Static lz:LocalizationService.Instance}" />
+                                </MultiBinding>
+                            </lc:StatusLabel.Text>
+                        </lc:StatusLabel>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+
+            <!-- Controller Configuration -->
+            <Border Grid.Column="1"
+                    Margin="5,0,5,0"
+                    CornerRadius="10">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                     Opacity="0.33"/>
+                </Border.Background>
+
+                <StackPanel Orientation="Vertical">
+                    
+                    <TextBlock Text="{lz:Localize SectionControllerConfigStatusName}"
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                Margin="0,4,0,2"
+                                Opacity="0.4"/>
+
+                    <!-- Controller Configuration subgrid -->
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- No Configuration Found -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerStatusNoConfigShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagNoConfig, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusWarning}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusNoConfigTip}" />
+
+                        <!-- More Sensors were Detected than could be stored in ROM -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerStatusSensorsOutOfRomShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagTooManySensorsStored, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusWarning}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusSensorsOutOfRomTip}" />
+
+                        <!-- Saved Sensors do not Fit in RAM -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerStatusSensorsOutOfRamShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagTooManySensorsDetected, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusWarning}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusSensorsOutOfRamTip}" />
+
+                        <!-- The Target Sensor for the Operation wasn't Found -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="0" 
+                                        Text="{lz:Localize ControllerStatusSensorNotFoundShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagSensorNotFound, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusWarning}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusSensorNotFoundTip}" />
+
+
+                        <!-- System Configuration is not Applicable -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="1" 
+                                        Text="{lz:Localize ControllerStatusSystemConfigErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagSystemConfigError, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusSystemConfigErrorTip}" />
+
+                        <!-- Fan Configuration is not Applicable -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="1" 
+                                        Text="{lz:Localize ControllerStatusFanConfigErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagFanConfigError, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusFanConfigErrorTip}" />
+
+                        <!-- Sensor Configuration is not Applicable -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="1" 
+                                        Text="{lz:Localize ControllerStatusSensorConfigErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagSensorConfigError, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusSensorConfigErrorTip}" />
+
+                        <!-- Writing to the EEPROM Failure -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="1" 
+                                        Text="{lz:Localize ControllerStatusEepromFailureShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagEEPROMFailure, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusEepromFailureTip}" />
+
+
+                        <!-- Hardware Scanning Failure -->
+                        <lc:StatusLabel Grid.Row="0" Grid.Column="2" 
+                                        Text="{lz:Localize ControllerStatusHardwareScanErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagHWFailed, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusHardwareScanErrorTip}" />
+
+                        <!-- Fan Pre-warm Failure -->
+                        <lc:StatusLabel Grid.Row="1" Grid.Column="2" 
+                                        Text="{lz:Localize ControllerStatusPreWarmErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagPrewarmFailed, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusPreWarmErrorTip}" />
+
+                        <!-- Fan Scan Failure -->
+                        <lc:StatusLabel Grid.Row="2" Grid.Column="2" 
+                                        Text="{lz:Localize ControllerStatusFanScanErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagFanFailed, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusFanScanErrorTip}" />
+
+                        <!-- Sensor Scan Failure -->
+                        <lc:StatusLabel Grid.Row="3" Grid.Column="2" 
+                                        Text="{lz:Localize ControllerStatusSensorScanErrorShortName}" 
+                                        FontSize="13"
+                                        Padding="20,0"
+                                        Margin="5,4"
+                                        CornerRadius="10"
+                                        Height="20"
+                                        HorizontalAlignment="Center"
+                                        IsActive="{Binding SystemState.ConfigFlagSensorFailed, Mode=OneWay}" 
+                                        Background="{DynamicResource StatusError}" 
+                                        BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                        ToolTip.Tip="{lz:Localize ControllerStatusSensorScanErrorTip}" />
+
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <Border Grid.Column="2"
+                    Margin="5,0,10,0"
+                    CornerRadius="10">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                     Opacity="0.33"/>
+                </Border.Background>
+
+                <StackPanel Orientation="Vertical">
+                    
+                    <TextBlock Text="{lz:Localize SectionControllerSystemStatusName}"
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                Margin="0,4,0,2"
+                                Opacity="0.4"/>
+
+                    <!-- Controller status subgrid -->
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Status indicators subgrid -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Temperature Level Attention -->
+                            <lc:StatusLabel Grid.Row="0" Grid.Column="0"
+                                            Text="{lz:Localize ControllerStatusTempWarningShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusWarningTemperature, Mode=OneWay}"
+                                            Background="{DynamicResource StatusWarning}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusTempWarningTip}" />
+
+                            <!-- Low Fan RPM -->
+                            <lc:StatusLabel Grid.Row="0" Grid.Column="1"
+                                            Text="{lz:Localize ControllerStatusLowFanSpeedShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusWarningFanRPM, Mode=OneWay}"
+                                            Background="{DynamicResource StatusWarning}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusLowFanSpeedTip}" />
+
+                            <!-- Low Fan Power -->
+                            <lc:StatusLabel Grid.Row="0" Grid.Column="2" 
+                                            Text="{lz:Localize ControllerStatusLowFanPowerShortName}" 
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusWarningFanPower, Mode=OneWay}" 
+                                            Background="{DynamicResource StatusWarning}" 
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusLowFanPowerTip}" />
+
+                            <!-- Sensor Configuration Error -->
+                            <lc:StatusLabel Grid.Row="0" Grid.Column="3"
+                                            Text="{lz:Localize ControllerStatusBadSensorShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusWarningBadSensor, Mode=OneWay}"
+                                            Background="{DynamicResource StatusWarning}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusBadSensorTip}" />
+                            
+                            <!-- All System Parameters are OK -->
+                            <lc:StatusLabel Grid.Row="0" Grid.Column="4" 
+                                            Text="{lz:Localize ControllerStatusAllOkShortName}" 
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusNormal, Mode=OneWay}" 
+                                            Background="{DynamicResource StatusNormal}" 
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAllOkTip}" />
+
+
+                            <!-- Sensor Connection Error -->
+                            <lc:StatusLabel Grid.Row="1" Grid.Column="0"
+                                            Text="{lz:Localize ControllerStatusAlarmBadSensorShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmBadSensor, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmBadSensorTip}" />
+
+                            <!-- MAX31790 Communication Error -->
+                            <lc:StatusLabel Grid.Row="1" Grid.Column="1"
+                                            Text="{lz:Localize ControllerStatusAlarmMaxShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmMAX, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmMaxTip}" />
+
+                            <!-- POTs Communication Error -->
+                            <lc:StatusLabel Grid.Row="1" Grid.Column="2"
+                                            Text="{lz:Localize ControllerStatusAlarmPotShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmPOTs, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmPotTip}" />
+
+                            <!-- Insufficient Free RAM -->
+                            <lc:StatusLabel Grid.Row="1" Grid.Column="3"
+                                            Text="{lz:Localize ControllerStatusAlarmLowRamShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmLowRam, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmLowRamTip}" />
+
+                            <!-- Fatal System Failure (usually due to Configuration saving Errors) -->
+                            <lc:StatusLabel Grid.Row="1" Grid.Column="4"
+                                            Text="{lz:Localize ControllerStatusAlarmFailureShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmGeneralFailure, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmFailureTip}" />
+
+
+
+                            <!-- Critical Temperature -->
+                            <lc:StatusLabel Grid.Row="2" Grid.Column="0"
+                                            Text="{lz:Localize ControllerStatusAlarmTempShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmTemperature, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmTempTip}" />
+
+                            <!-- Fan Speed is Critically Low -->
+                            <lc:StatusLabel Grid.Row="2" Grid.Column="1" 
+                                            Text="{lz:Localize ControllerStatusCriticalFanSpeedShortName}" 
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmFanRPM, Mode=OneWay}" 
+                                            Background="{DynamicResource StatusError}" 
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusCriticalFanSpeedTip}" />
+
+                            <!-- Fan Power is Critically Low -->
+                            <lc:StatusLabel Grid.Row="2" Grid.Column="2" 
+                                            Text="{lz:Localize ControllerStatusCriticalFanPowerShortName}" 
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmFanPower, Mode=OneWay}" 
+                                            Background="{DynamicResource StatusError}" 
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusCriticalFanPowerTip}" />
+
+                            <!-- Failed Fan -->
+                            <lc:StatusLabel Grid.Row="2" Grid.Column="3"
+                                            Text="{lz:Localize ControllerStatusAlarmFanFailedShortName}"
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmFanFailed, Mode=OneWay}"
+                                            Background="{DynamicResource StatusError}"
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmFanFailedTip}" />
+
+                            <!-- Problems with the Power Supply of Fans -->
+                            <lc:StatusLabel Grid.Row="2" Grid.Column="4" 
+                                            Text="{lz:Localize ControllerStatusAlarmPowerShortName}" 
+                                            FontSize="13"
+                                            Padding="20,0"
+                                            Margin="5,4"
+                                            CornerRadius="10"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            IsActive="{Binding SystemState.StatusAlarmPower, Mode=OneWay}" 
+                                            Background="{DynamicResource StatusError}" 
+                                            BorderBrush="{DynamicResource TextControlBorderBrush}"
+                                            ToolTip.Tip="{lz:Localize ControllerStatusAlarmPowerTip}" />
+                        </Grid>
+
+                        <!-- USB Communication result -->
+                        <StackPanel Grid.Row="1"
+                                    Margin="5,0"
+                                    HorizontalAlignment="Left"
+                                    Orientation="Horizontal">
+                            <!-- Last USB-communication Request Result -->
+                            <lc:StatusLabel Text="{lz:Localize ControllerRequestResultFullName}" 
+                                            FontSize="13"
+                                            TextAlignment="Right" 
+                                            IsActive="True" 
+                                            ToolTip.Tip="{lz:Localize ControllerRequestResultTip}" />
+                            <lc:StatusLabel TextAlignment="Left" 
+                                            FontSize="13"
+                                            IsActive="True" 
+                                            ToolTip.Tip="{lz:Localize ControllerRequestResultTip}">
+                                <lc:StatusLabel.Text>
+                                    <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                    Mode="OneWay">
+                                        <Binding Path="SystemState.LastHostRequestErrorCode" />
+                                    </MultiBinding>
+                                </lc:StatusLabel.Text>
+                            </lc:StatusLabel>
+                        </StackPanel>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+
+</Window>

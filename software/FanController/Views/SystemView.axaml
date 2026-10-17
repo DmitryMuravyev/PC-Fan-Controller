@@ -1,0 +1,429 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:FanController.ViewModels"
+             xmlns:ct="using:FanController.Contracts"
+             xmlns:lc="using:FanController.Controls"
+             xmlns:lv="using:FanController.Views"
+             xmlns:cv="using:FanController.Converters"
+             xmlns:lz="using:FanController.Localization"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="500"
+             x:Class="FanController.Views.SystemView"
+             x:DataType="vm:SystemViewModel">
+    <!--
+    <UserControl.DataContext>
+        <vm:SystemViewModel />
+    </UserControl.DataContext>
+    -->
+
+    <!-- Styles (or reference from App.axaml) -->
+    <UserControl.Styles>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+            <!--<Setter Property="FontSize" Value="10.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.paramLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,16,0"/>
+            <Setter Property="Opacity" Value="0.75"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.readOnly">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.45"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+    </UserControl.Styles>
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Top row with buttons -->
+            <RowDefinition Height="Auto"/>  <!-- Separator row -->
+            <RowDefinition Height="Auto"/>  <!-- Basic settings row -->
+            <RowDefinition Height="*"/>     <!-- Substitution Matrix row -->
+        </Grid.RowDefinitions>
+
+        <!-- Top row with main buttons -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Content="{lz:Localize ButtonSaveConfigCaption}"
+                    Click="OnSaveConfigClick"
+                    Margin="10,10,5,5"
+                    ToolTip.Tip="{lz:Localize ButtonSaveConfigTip}" />
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{lz:Localize ButtonFactoryResetCaption}"
+                        Click="OnFactoryResetClick"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonFactoryResetTip}" />
+                <Button Content="{lz:Localize ButtonRebootCaption}"
+                        Click="OnRebootClick"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonRebootTip}" />
+                <Button Content="{lz:Localize ButtonBackupCaption}" 
+                        Click="OnBackupConfigClick"
+                        Margin="5,10,5,5" 
+                        ToolTip.Tip="{lz:Localize ButtonBackupTip}" />
+                <Button Content="{lz:Localize ButtonRestoreCaption}" 
+                        Click="OnRestoreConfigClick"
+                        Margin="5,10,10,5" 
+                        ToolTip.Tip="{lz:Localize ButtonRestoreTip}" />
+                <!-- <Button Content="Rescan Sensors" Margin="5,10,10,5" ToolTip.Tip="Start the temperature sensor scanning process (a few seconds)." /> -->
+            </StackPanel>
+        </Grid>
+
+        <!-- Separator row -->
+        <Separator Grid.Row="1" />
+
+        <!-- Basic settings row -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="6*" />
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+
+            
+            <StackPanel Grid.Column="0" Grid.Row="0"
+                        Margin="16,0,16,20"
+                        Spacing="10"
+                        Grid.IsSharedSizeScope="True">
+
+                <!-- APPEARANCE -->
+                <TextBlock Text="{lz:Localize SectionAppearanceName}" Classes="groupHeader"/>
+
+                <!-- Display rotation option -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemDisplayRotationParameterFullName}" 
+                               Classes="paramLabel" />
+                    <ComboBox Grid.Column="1" 
+                              VerticalAlignment="Center" 
+                              Width="100" 
+                              ItemsSource="{Binding AllDisplayRotationOptions}"
+                              SelectedItem="{Binding DisplayRotation, Mode=TwoWay}"
+                              IsEnabled="{Binding DisplayEnabled}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- Display brightness option -->
+                <Grid Margin="0,4,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemDisplayBrightnessParameterFullName}" 
+                               Classes="paramLabel" />
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Stretch"
+                                Spacing="8">
+                        <lc:CompactSlider x:Name="DisplayBrightnessSlider"
+                                    Tag="DisplayBrightnessSlider"
+                                    IsEnabled="{Binding DisplayEnabled}"
+                                    Width="150"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    SmallChange="0.01"
+                                    Value="{Binding DisplayBrightness}"/>
+                        <TextBlock  IsEnabled="{Binding DisplayEnabled}"
+                                    Classes="deactivatable"
+                                    Width="50"
+                                    TextAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding DisplayBrightness, Converter={x:Static cv:DoubleToPercentConverter.Instance}, Mode=OneWay}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Buzzer mode option -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemBuzzerModeParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SystemBuzzerModeParameterTip}" />
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                        <ComboBox VerticalAlignment="Center"
+                                  Width="150"
+                                  ItemsSource="{Binding AllBuzzerAlarmProfiles}"
+                                  SelectedItem="{Binding BuzzerAlarmProfile, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                          Mode="OneWay">
+                                                <Binding />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Content="{lz:Localize ButtonCustomizeCaption}" 
+                                Click="OnCustomizeBuzzerOptionsClick"
+                                Margin="10,0,0,0" 
+                                HorizontalAlignment="Stretch" 
+                                IsEnabled="{Binding BuzzerAlarmProfile,
+                                                    Converter={x:Static cv:EnumEqualConverter.Instance},
+                                                    ConverterParameter={x:Static ct:AlarmProfile.Custom},
+                                                    Mode=OneWay}"
+                                ToolTip.Tip="{lz:Localize ButtonCustomizeTip}" />
+                    </StackPanel>
+                </Grid>
+                
+                <!-- Buzzer waveform option -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemBuzzerWaveformParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SystemBuzzerWaveformParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              VerticalAlignment="Center"
+                              Width="150"
+                              ItemsSource="{Binding AllBuzzerWaveformOptions}"
+                              SelectedItem="{Binding BuzzerWaveformOption, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Grid.Row="0"
+                Margin="16,0,16,20"
+                Spacing="10"
+                VerticalAlignment="Stretch"
+                Grid.IsSharedSizeScope="True">
+
+                <!-- BEHAVIOUR -->
+                <TextBlock Text="{lz:Localize SectionBehaviourName}" Classes="groupHeader"/>
+
+                <!-- Professional mode option -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemProModeParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SystemProModeParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding ProfessionalModeOption}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+                <!-- Detecting Fan properties option -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemDetectFanPropertiesParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SystemDetectFanPropertiesParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding FanModelDetectionOption}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+                <!-- Lock Substution matrix option -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemLockSubstMatrixParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SystemLockSubstMatrixParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding LockSubstitutionMatrixOption}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Grid.Row="0"
+                        Margin="16,0,16,20"
+                        Spacing="12"
+                        VerticalAlignment="Stretch"
+                        Grid.IsSharedSizeScope="True">
+
+                <!-- OTHER -->
+                <TextBlock Text="{lz:Localize SectionOtherParametersName}" Classes="groupHeader"/>
+
+                <!-- Firmware version -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemFirmwareVersionParameterFullName}" 
+                                Classes="paramLabel"
+                                ToolTip.Tip="{lz:Localize SystemFirmwareVersionParameterTip}" />
+                    <TextBlock Grid.Column="1" Text="{Binding FirmwareVersion}" Classes="readOnly"/>
+                </Grid>
+
+                <!-- Display enabled -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemDisplaySupportParameterFullName}" 
+                                Classes="paramLabel"
+                                ToolTip.Tip="{lz:Localize SystemDisplaySupportParameterTip}" />
+                    <Image Grid.Column="1" 
+                            Width="16" 
+                            Height="16"
+                            HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding DisplayEnabled, 
+                                            Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                            Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- Logger enabled -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemLoggerSupportParameterFullName}" 
+                                Classes="paramLabel"
+                                ToolTip.Tip="{lz:Localize SystemLoggerSupportParameterTip}" />
+                    <Image Grid.Column="1" 
+                            Width="16" 
+                            Height="16"
+                            HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding LoggerEnabled, 
+                                            Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                            Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- Normal High Load Power Bus Voltage -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SystemHLPBVoltageParameterFullName}" 
+                                Classes="paramLabel"
+                                ToolTip.Tip="{lz:Localize SystemHLPBVoltageParameterTip}" />
+                    
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                <Binding Path="NormalHLPBVoltage"/>
+                                <ReflectionBinding Path="[VoltageParameterFullFormat]"
+                                                    Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+            </StackPanel>
+
+            <!-- Dirty indicator -->
+            <TextBlock Grid.Column="2" Grid.Row="1"
+                        Margin="0,0,16,0"
+                        Text="{lz:Localize UnsavedChangesCaption}"
+                        Foreground="{DynamicResource StatusWarning}"
+                        FontSize="12"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        IsVisible="{Binding IsDirty}"/>
+
+        </Grid>
+
+        <Grid Grid.Row="3" 
+              Margin="16,0,16,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>  <!-- Header -->
+                <RowDefinition Height="*"/>     <!-- Substitution Matrix DataGrid -->
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           HorizontalAlignment="Left"
+                           Text="{lz:Localize SectionSubstitutionMatrixName}" 
+                           Classes="groupHeader" 
+                           Margin="0,0,0,10"/>
+
+                <!-- Substitution Matrix Dirty indicator -->
+                <TextBlock Grid.Column="1"
+                Text="{lz:Localize SubstitutionMatrixChangedCaption}"
+                           Foreground="{DynamicResource StatusWarning}"
+                           FontSize="12"
+                           HorizontalAlignment="Right"
+                           IsVisible="{Binding IsDirtySM}"/>
+            </Grid>
+
+            <DataGrid x:Name="SubstitutionMatrixDataGrid"
+                      Grid.Row="1"
+                      ItemsSource="{Binding SubstitutionMatrix}"
+                      AutoGenerateColumns="False"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="False"
+                      CanUserSortColumns="False"
+                      GridLinesVisibility="All"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto" />
+        </Grid>
+
+    </Grid>
+</UserControl>

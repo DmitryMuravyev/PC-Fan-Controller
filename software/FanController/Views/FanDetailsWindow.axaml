@@ -1,0 +1,997 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ct="using:FanController.Contracts"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:lc="using:FanController.Controls"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
+        xmlns:bh="using:FanController.Behaviors"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FanController.Views.FanDetailsWindow"
+        x:DataType="vm:FanDetailsViewModel"
+        Title="{lz:Localize FanDetailsWindowTitle}"
+        MinWidth="500"
+        MaxWidth="500"
+        MinHeight="512">
+
+    <!-- Styles (or reference from App.axaml) -->
+    <Window.Styles>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+            <!--<Setter Property="FontSize" Value="10.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.paramLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,16,0"/>
+            <Setter Property="Opacity" Value="0.75"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.readOnly">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.45"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+    </Window.Styles>
+
+
+    <!-- Root: header pinned at top, scrollable body, footer pinned at bottom -->
+    <DockPanel>
+
+        <!-- HEADER -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Orientation="Vertical" Spacing="5">
+                <TextBlock Text="{Binding Name, Mode=OneTime}"
+                           FontSize="18"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="{lz:Localize FanDetailsHeaderCaption}"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Opacity="0.55"/>
+            </StackPanel>
+        </Border>
+
+        <!-- FOOTER -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="10,10">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <!-- Dirty indicator -->
+                <TextBlock Grid.Column="0"
+                           Text="{lz:Localize UnsavedChangesCaption}"
+                           Foreground="{DynamicResource StatusWarning}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding IsDirty}"/>
+                <!-- Cancel -->
+                <Button Grid.Column="1"
+                        Content="{lz:Localize ButtonCancelCaption}"
+                        Margin="0,0,10,0"
+                        Click="OnCancelClick" />
+                <!-- Save -->
+                <Button Grid.Column="2"
+                        Content="{lz:Localize ButtonSaveConfigCaption}"
+                        Classes="accent"
+                        Click="OnSaveClick"
+                        ToolTip.Tip="{lz:Localize ButtonSaveConfigTip}" />
+            </Grid>
+        </Border>
+
+        <!-- BODY - scrollable parameter list -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <!--
+                Grid.IsSharedSizeScope="True" makes SharedSizeGroup="lbl"
+                work across ALL child Grids, so every label column aligns.
+            -->
+            <StackPanel Margin="16,14,16,20"
+                        Spacing="10"
+                        Grid.IsSharedSizeScope="True">
+
+
+                <!-- IDENTITY -->
+                <TextBlock Text="{lz:Localize SectionIdentityName}" Classes="groupHeader"/>
+
+                <!-- Index -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanIndexParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanIndexParameterTip}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Index}" Classes="readOnly"/>
+                </Grid>
+
+                <!-- Name -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanNameParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanNameParameterTip}" />
+                    <!-- Up to 8 characters from the set supported by the device -->
+                    <TextBox Grid.Column="1" 
+                             Width="150"
+                             HorizontalAlignment="Left"
+                             Text="{Binding Name, Mode=TwoWay}">
+                        <i:Interaction.Behaviors>
+                            <bh:TextBoxRestrictionBehavior MaxLength="8" 
+                                                           AllowedPattern="[0-9a-zA-Z !%&amp;&apos;()*+,\-./:;&lt;=&gt;?\[\\\]^_{|}~]"/>
+                        </i:Interaction.Behaviors>
+                    </TextBox>
+                </Grid>
+
+
+                <!-- HARDWARE CAPABILITIES (read-only) -->
+                <TextBlock Text="{lz:Localize SectionHardwareCapabilitiesName}" Classes="groupHeader"/>
+
+                <!-- HardwarePwmAvailable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{lz:Localize FanPwmHardwareParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmHardwareParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding HardwarePwmAvailable, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- HardwareRpmAvailable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanTachometerHardwareParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanTachometerHardwareParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding HardwareRpmAvailable, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- HardwareVoltmeterAvailable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanVoltmeterHardwareParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanVoltmeterHardwareParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding HardwareVoltmeterAvailable, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- HardwareMosfetAvailable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanMosfetHardwareParameterFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanMosfetHardwareParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding HardwareMosfetAvailable, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- HardwareDcdcAvailable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanDcdcHardwareParameterFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanDcdcHardwareParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding HardwareDcdcAvailable, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+
+                <!-- POWER CONTROL METRICS (read-only) -->
+                <TextBlock Text="{lz:Localize SectionPowerMetricsName}"  Classes="groupHeader"/>
+
+                <!-- MaxVoltage -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanMaxVoltageParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanMaxVoltageParameterTip}" />
+                    
+                    <!-- Here and below I'll use the converter + lz:Localize to provide 
+                         the ability to switch culture (language) on the fly. -->
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                <Binding Path="MaxVoltage"/>
+                                <ReflectionBinding Path="[VoltageParameterFullFormat]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- MaxVoltageControl -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanMaxVoltageControlParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanMaxVoltageControlParameterTip}" />
+                    <TextBlock Grid.Column="1" 
+                               Classes="readOnly"
+                               Text="{Binding MaxVoltageControl, 
+                               Converter={x:Static cv:DoubleToPercentConverter.Instance}, 
+                               Mode=OneWay}" />
+                </Grid>
+
+                <!-- MinVoltage -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanMinVoltageParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanMinVoltageParameterTip}" />
+                    
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                <Binding Path="MinVoltage"/>
+                                <ReflectionBinding Path="[VoltageParameterFullFormat]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- MinVoltageControl -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanMinVoltageControlParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanMinVoltageControlParameterTip}" />
+                    <TextBlock Grid.Column="1"
+                               Classes="readOnly"
+                               Text="{Binding MinVoltageControl, 
+                               Converter={x:Static cv:DoubleToPercentConverter.Instance}, 
+                               Mode=OneWay}" />
+                </Grid>
+
+
+                <!-- CONNECTED FAN PARAMETERS (mostly read-only detection results) -->
+                <TextBlock Text="{lz:Localize SectionConnectedFanName}"  Classes="groupHeader"/>
+
+                <!-- ModelConnected -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanConnectedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanConnectedParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                        IsChecked="{Binding ModelConnected}"
+                        OnContent="{lz:Localize SwitchYesCaption}" 
+                        OffContent="{lz:Localize SwitchNoCaption}"/>
+                </Grid>
+
+                <!-- ModelTachometer -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanTachometerParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanTachometerParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ModelTachometer, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- ModelPwm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ModelPwm, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>              
+                </Grid>
+
+                <!-- ModelDcdcRangeDetected -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPowerControlConfirmedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPowerControlConfirmedParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ModelDcdcRangeDetected, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- ModelPwmRangeDetected -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmControlConfirmedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmControlConfirmedParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ModelPwmRangeDetected, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- ModelPwmFreewheelTachometer -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmFreewheelTachometerParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmFreewheelTachometerParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ModelPwmFreewheelTachometer, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- ModelPwmExcessiveFullSpeed -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmExcessiveFullSpeedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmExcessiveFullSpeedParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding ModelPwmExcessiveFullSpeed, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- ModelSize -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanSizeParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanSizeParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="150"
+                              ItemsSource="{Binding AllModelSizes}"
+                              SelectedItem="{Binding ModelSize, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                            <Binding Source="ShortValue"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- ModelPower -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPowerParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPowerParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="150"
+                              ItemsSource="{Binding AllModelPowerTypes}"
+                              SelectedItem="{Binding ModelPower, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                            <Binding Source="ShortValue"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- ModelClass -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanClassParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanClassParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="150"
+                              ItemsSource="{Binding AllModelClasses}"
+                              SelectedItem="{Binding ModelClass, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                            <Binding Source="ShortValue"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+
+                <!-- SPEED METRICS (read-only) -->
+                <TextBlock Text="{lz:Localize SectionSpeedMetricsName}" Classes="groupHeader"/>
+
+                <!-- Max RPM -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanMaxSpeedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanMaxSpeedParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">      
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}" 
+                                          StringFormat='{}{0}' 
+                                          Mode="OneWay">
+                                <Binding Path="MaxPPM" />
+                                <Binding Path="OptionPpr" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- PwmPenultimatePpm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPenultimateSpeedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPenultimateSpeedParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                          StringFormat='{}{0}'
+                                          Mode="OneWay">
+                                <Binding Path="PwmPenultimatePpm" />
+                                <Binding Path="OptionPpr" />
+                                <Binding Path="ModelPwmExcessiveFullSpeed" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- PwmControlledMinPpm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmMinSpeedParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmMinSpeedParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                          StringFormat='{}{0}'
+                                          Mode="OneWay">
+                                <Binding Path="PwmControlledMinPpm" />
+                                <Binding Path="OptionPpr" />
+                                <Binding Path="ModelPwmRangeDetected" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- MinPwmControl -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmMinControlParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmMinControlParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:OptionalDoubleToPercentConverter.Instance}">
+                                <Binding Path="MinPwmControl"/>
+                                <Binding Path="ModelPwmRangeDetected"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- PwrControlledMinPpm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwrMinSpeedParameterFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwrMinSpeedParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:PpmToRpmConverter.Instance}"
+                                          StringFormat='{}{0}'
+                                          Mode="OneWay">
+                                <Binding Path="PwrControlledMinPpm" />
+                                <Binding Path="OptionPpr" />
+                                <Binding Path="ModelDcdcRangeDetected" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- MinPwrControl -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwrMinControlParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwrMinControlParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:OptionalDoubleToPercentConverter.Instance}">
+                                <Binding Path="MinPwrControl"/>
+                                <Binding Path="ModelDcdcRangeDetected"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+
+                <!-- FAN OPTIONS (editable) -->
+                <TextBlock Text="{lz:Localize SectionFanOptionsName}" Classes="groupHeader"/>
+
+                <!-- OptionPpr -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPprParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPprParameterShortTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="100"
+                              ItemsSource="{Binding PprOptions}"
+                              SelectedItem="{Binding OptionPpr, Mode=TwoWay}"/>
+                </Grid>
+
+                <!-- OptionRoc -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanRocParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanRocParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="170"
+                              ItemsSource="{Binding AllRocOptions}"
+                              SelectedItem="{Binding OptionRoc, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- OptionSpinPowerPwm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmSpinParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmSpinParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="100"
+                              ItemsSource="{Binding AllSpinUpOptions}"
+                              SelectedItem="{Binding OptionSpinPowerPwm, Mode=TwoWay}"
+                              IsEnabled="{Binding ModelPwmRangeDetected}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- OptionSpinPowerPwr -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwrSpinParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwrSpinParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="100"
+                              ItemsSource="{Binding AllSpinUpOptions}"
+                              SelectedItem="{Binding OptionSpinPowerPwr, Mode=TwoWay}"
+                              IsEnabled="{Binding ModelDcdcRangeDetected}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- OptionPidEnabledPwm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmPidEnabledParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmPidEnabledParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsEnabled="{Binding ModelPwmRangeDetected}"
+                                  IsChecked="{Binding OptionPidEnabledPwm}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+                <!-- OptionPidSlowPwm -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwmPidSlowParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwmPidSlowParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsEnabled="{Binding ModelPwmRangeDetected}"
+                                  IsChecked="{Binding OptionPidSlowPwm}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+                <!-- OptionPidEnabledPwr -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwrPidEnabledParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwrPidEnabledParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsEnabled="{Binding ModelDcdcRangeDetected}"
+                                  IsChecked="{Binding OptionPidEnabledPwr}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+                <!-- OptionPidSlowPwr -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPwrPidSlowParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPwrPidSlowParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsEnabled="{Binding ModelDcdcRangeDetected}"
+                                  IsChecked="{Binding OptionPidSlowPwr}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+                <!-- OptionAlwaysOn -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanAlwaysOnParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanAlwaysOnParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding OptionAlwaysOn}"
+                                  OnContent="{lz:Localize SwitchOnCaption}"
+                                  OffContent="{lz:Localize SwitchOffCaption}" />
+                </Grid>
+
+
+                <!-- CONTROL SETTINGS (editable) -->
+                <TextBlock Text="{lz:Localize SectionControlSettingsName}" Classes="groupHeader"/>
+
+                <!-- ControlMode -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanControlModeParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanControlModeParameterTip}" />
+
+                    <ComboBox Grid.Column="1"
+                              Width="150"
+                              ItemsSource="{Binding AllControlModes}"
+                              SelectedValueBinding="{ReflectionBinding Mode}"
+                              SelectedValue="{Binding ControlMode, Mode=TwoWay}">
+                        <ComboBox.Styles>
+                            <!-- Only the modes supported by this fan can be selected -->
+                            <Style Selector="ComboBoxItem" x:DataType="vm:ControlModeOption">
+                                <Setter Property="IsEnabled" Value="{Binding IsAvailable}"/>
+                            </Style>
+                        </ComboBox.Styles>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ControlModeOption">
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding Path="Mode" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                </Grid>
+
+                <!-- OperationMode -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanOperationModeParameterFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanOperationModeParameterTip}" />
+                    <ComboBox Grid.Column="1"
+                              Width="150"
+                              ItemsSource="{Binding AllOperationModes}"
+                              SelectedItem="{Binding OperationMode, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                      Mode="OneWay">
+                                            <Binding />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- ControlBasis -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize FanPowerProfileParameterFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize FanPowerProfileParameterTip}" />
+
+                    <StackPanel Grid.Column="1" Spacing="5">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Stretch"
+                                    Spacing="8">
+                            <lc:CompactSlider Classes="rangeTrack"
+                                        Width="150"
+                                        Margin="0,8,0,0"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        SmallChange="0.01"
+                                        Value="{Binding ControlBasis}"
+                                        RangeStart="{Binding ControlBasis, Converter={x:Static cv:BasisToRangeConverter.Instance}, ConverterParameter=True, Mode=OneWay}" 
+                                        RangeEnd="{Binding ControlBasis, Converter={x:Static cv:BasisToRangeConverter.Instance}, ConverterParameter=False, Mode=OneWay}" />
+                            <TextBlock FontSize="11"
+                                        Width="60"
+                                        TextAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Margin="4,0,0,0"
+                                        Text="{Binding ControlBasis, Converter={x:Static cv:BasisToRangeConverter.Instance}, Mode=OneWay}" />
+                        </StackPanel>
+                        <ComboBox Width="150"
+                                  ItemsSource="{Binding AllPowerProfiles}"
+                                  SelectedItem="{Binding PowerProfile, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}"
+                                                          Mode="OneWay">
+                                                <Binding />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+
+            </StackPanel>
+        </ScrollViewer>
+
+    </DockPanel>
+</Window>

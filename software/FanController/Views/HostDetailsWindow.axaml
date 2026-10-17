@@ -1,0 +1,192 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
+        xmlns:bh="using:FanController.Behaviors"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FanController.Views.HostDetailsWindow"
+        x:DataType="vm:HostDetailsViewModel"
+        SizeToContent="WidthAndHeight"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+
+    <Window.Title>
+        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+            <Binding Path="IsAddWindow"/>
+            <ReflectionBinding Path="[HostAddWindowTitle]"
+                                Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+            <ReflectionBinding Path="[HostEditWindowTitle]"
+                                Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+        </MultiBinding>
+    </Window.Title>
+
+    <!-- Styles (or reference from App.axaml) -->
+    <Window.Styles>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+            <!--<Setter Property="FontSize" Value="10.5"/>-->
+        </Style>
+
+        <Style Selector="TextBlock.paramLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,16,0"/>
+            <Setter Property="Opacity" Value="0.75"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+        </Style>
+
+        <Style Selector="TextBlock.readOnly">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.45"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+
+        <!-- Custom ValidationResult font size -->
+        <Style Selector="DataValidationErrors">
+            <Setter Property="ErrorTemplate">
+                <DataTemplate>
+                    <TextBlock 
+                        Text="{Binding Converter={x:Static cv:ValidationErrorsConverter.Instance}}"
+                        FontSize="10"
+                        Foreground="{DynamicResource StatusWarning}"
+                        Margin="4,0,4,0"
+                        HorizontalAlignment="Left"
+                        TextWrapping="Wrap"/>
+                </DataTemplate>
+            </Setter>
+        </Style>
+
+        <!-- Custom ValidationResult TextBox Border -->
+        <Style Selector="TextBox:error /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{DynamicResource StatusWarning}"/>
+        </Style>
+    </Window.Styles>
+
+    <StackPanel Margin="0"
+                Orientation="Vertical">
+
+        <!-- Form fields -->
+        <StackPanel Margin="16,14,16,16"
+                    Spacing="10"
+                    Grid.IsSharedSizeScope="True">
+
+            <!-- Name -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{lz:Localize HostNameParameterFullName}" 
+                            Classes="paramLabel"
+                            ToolTip.Tip="{lz:Localize HostNameParameterTip}" />
+                <!-- Up to 64 characters -->
+                <TextBox Grid.Column="1" 
+                            Width="400"
+                            HorizontalAlignment="Left"
+                            PlaceholderText="{lz:Localize HostNameParameterPlaceholder}"
+                            MaxLength="64"
+                            Text="{Binding Name, Mode=TwoWay}">
+                </TextBox>
+            </Grid>
+
+            <!-- Host / IP -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{lz:Localize HostAddressParameterFullName}" 
+                            Classes="paramLabel"
+                            ToolTip.Tip="{lz:Localize HostAddressParameterTip}" />
+                <!-- Host name, IPv4 or IPv6 address -->
+                <TextBox Grid.Column="1" 
+                            Width="400"
+                            HorizontalAlignment="Left"
+                            PlaceholderText="{lz:Localize HostAddressParameterPlaceholder}"
+                            Text="{Binding Host, Mode=TwoWay}">
+                    <i:Interaction.Behaviors>
+                        <bh:TextBoxRestrictionBehavior 
+                            MaxLength="253" 
+                            AllowedPattern="[0-9a-zA-Z\-:.]"/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
+            </Grid>
+
+            <!-- Port -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{lz:Localize HostPortParameterFullName}" 
+                            Classes="paramLabel"
+                            ToolTip.Tip="{lz:Localize HostPortParameterTip}" />
+                <NumericUpDown Grid.Column="1"
+                                Width="200"
+                                HorizontalAlignment="Left"
+                                Value="{Binding Port, Mode=TwoWay}"
+                                Minimum="1" Maximum="65535"
+                                Increment="1"
+                                FormatString="0"
+                                ParsingNumberStyle="Integer"/>
+            </Grid>
+
+        </StackPanel>
+
+        <!-- Bottom row with main buttons -->
+        <Border BorderThickness="0,1,0,0" 
+                BorderBrush="{DynamicResource SystemBaseLowColor}"
+                HorizontalAlignment="Stretch">
+
+            <Grid ColumnDefinitions="*,Auto,Auto"
+                    Margin="10,10">
+                <!-- Dirty indicator -->
+                <TextBlock Grid.Column="0"
+                            Text="{lz:Localize UnsavedChangesCaption}"
+                            Foreground="{DynamicResource StatusWarning}"
+                            FontSize="12"
+                            VerticalAlignment="Center"
+                            IsVisible="{Binding IsDirty}"/>
+
+                <!-- Cancel -->
+                <Button Grid.Column="1"
+                        Content="{lz:Localize ButtonCancelCaption}"
+                        Margin="0,0,10,0"
+                        Click="OnCancelClick" />
+
+                <!-- Add / Save -->
+                <Button Grid.Column="2"
+                        Classes="accent"
+                        Click="OnSaveClick"
+                        IsEnabled="{Binding IsValid}">
+                    <Button.Content>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="IsAddWindow"/>
+                            <ReflectionBinding Path="[ButtonAddHostCaption]"
+                                                Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonSaveCaption]"
+                                                Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </Button.Content>
+                    <ToolTip.Tip>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="IsAddWindow"/>
+                            <ReflectionBinding Path="[ButtonAddHostTip]"
+                                                Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonSaveHostTip]"
+                                                Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </ToolTip.Tip>
+                </Button>
+            </Grid>
+        </Border>
+
+    </StackPanel>
+</Window>

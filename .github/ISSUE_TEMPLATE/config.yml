@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+# Uncomment and set the owner once Discussions is enabled in the repository:
+# contact_links:
+#   - name: Questions and ideas
+#     url: https://github.com/<owner>/fan-controller/discussions
+#     about: General questions, hardware topics and ideas about the project.

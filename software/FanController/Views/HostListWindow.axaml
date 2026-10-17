@@ -1,0 +1,256 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FanController.Views.HostListWindow"
+        x:DataType="vm:HostListViewModel"
+        Title="{lz:Localize HostListWindowTitle}"
+        Height="480"
+        Width="860"
+        MinWidth="640" 
+        MinHeight="400">
+
+    <Window.Styles>
+        <!-- Force DataGrid to select only rows, but not the individual cells -->
+        <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+
+        <!-- Disable Flyout menu scroll arrows (for clean rendering on Linux) -->
+        <Style Selector="MenuFlyoutPresenter">
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Top row with buttons -->
+            <RowDefinition Height="Auto"/>  <!-- Separator row -->
+            <RowDefinition Height="*"/>     <!-- Hosts table -->
+            <RowDefinition Height="Auto"/>  <!-- Bottom row with buttons -->
+        </Grid.RowDefinitions>
+
+        <!-- Top row with main buttons -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              IsEnabled="{Binding !IsBusy}">
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="{lz:Localize ButtonAddHostCaption}"
+                        Margin="10,10,5,5"
+                        Click="OnAddClick"
+                        ToolTip.Tip="{lz:Localize ButtonAddHostTip}" />
+                <Button Content="{lz:Localize ButtonRemoveHostCaption}"
+                        Margin="5,10,5,5"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Click="OnRemoveClick"
+                        ToolTip.Tip="{lz:Localize ButtonRemoveHostTip}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{lz:Localize ButtonReconnectHostCaption}"
+                        Click="OnReconnectClick"
+                        IsEnabled="{Binding SelectionNotEmpty}"
+                        Margin="5,10,10,5"
+                        ToolTip.Tip="{lz:Localize ButtonReconnectHostTip}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Separator row -->
+        <Separator Grid.Row="1" />
+
+        <DataGrid Grid.Row="2"
+              ItemsSource="{Binding HostItems}"
+              AutoGenerateColumns="False"
+              CanUserReorderColumns="True"
+              CanUserResizeColumns="True"
+              CanUserSortColumns="False"
+              IsReadOnly="False"
+              IsEnabled="{Binding !IsBusy}"
+              HeadersVisibility="Column"
+              GridLinesVisibility="Horizontal"
+              SelectionMode="Single"
+              SelectedItem="{Binding SelectedHost, Mode=TwoWay}"
+              VerticalScrollBarVisibility="Auto"
+              RowHeight="40"
+              Margin="5">
+
+            <DataGrid.Columns>
+
+                <!-- Selection checkbox -->
+                <DataGridTemplateColumn Width="70" MinWidth="70"
+                                        CanUserResize="False"
+                                        CanUserReorder="False">
+                    <!-- Header with CheckBox -->
+                    <DataGridTemplateColumn.Header>
+                        <CheckBox Initialized="OnHeaderCheckBoxInitialized"
+                                  Margin="0"
+                                  Padding="0"
+                                  HorizontalAlignment="Left" />
+                    </DataGridTemplateColumn.Header>
+
+                    <!-- Cell with CheckBox -->
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:HostItem">
+                            <CheckBox IsChecked="{Binding Selected}"
+                                      HorizontalAlignment="Left"
+                                      Margin="12,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Configured Host Name -->
+                <DataGridTextColumn Width="*"
+                                    MinWidth="100"
+                                    CanUserReorder="True"
+                                    IsReadOnly="True"
+                                    Binding="{Binding Name, Mode=OneWay}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderHostNameCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderHostNameTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Status with color indicator -->
+                <DataGridTemplateColumn Width="120"
+                                        CanUserResize="False">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderHostStatusCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderHostStatusTip}" />
+                    </DataGridTemplateColumn.Header>
+
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:HostItem">
+                            <Border CornerRadius="4"
+                                    Padding="8,2"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Background="{Binding Status,
+                                        Converter={x:Static cv:HostStatusToBackgroundConverter.Instance}, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Ellipse Width="10" Height="10"
+                                             Margin="0,0,6,0"
+                                             Fill="{Binding Status,
+                                        Converter={x:Static cv:HostStatusToBackgroundConverter.Instance}, ConverterParameter=True, Mode=OneWay}" />
+                                    <TextBlock FontSize="11"
+                                               FontWeight="SemiBold"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                                <Binding Path="Status" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Configured Host Address -->
+                <DataGridTextColumn Width="*"
+                                    MinWidth="100"
+                                    CanUserReorder="True"
+                                    IsReadOnly="True"
+                                    Binding="{Binding Address, Mode=OneWay}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderHostAddressCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderHostAddressTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Configured Host Port -->
+                <DataGridTextColumn Width="80"
+                                    MinWidth="80"
+                                    CanUserReorder="True"
+                                    IsReadOnly="True"
+                                    Binding="{Binding Port, Mode=OneWay}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderHostPortCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderHostPortTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Service version -->
+                <DataGridTextColumn Width="100"
+                                    MinWidth="80"
+                                    CanUserReorder="True"
+                                    IsReadOnly="True"
+                                    Binding="{Binding ServiceVersion, Mode=OneWay}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderHostServiceVersionCaption}"
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderHostServiceVersionTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Device count -->
+                <DataGridTextColumn Width="90"
+                                    CanUserReorder="True"
+                                    CanUserResize="False"
+                                    IsReadOnly="True"
+                                    Binding="{Binding DeviceCount, StringFormat='{}{0}', Mode=OneWay}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock Text="{lz:Localize ColumnHeaderHostDeviceCountCaption}" 
+                                   ToolTip.Tip="{lz:Localize ColumnHeaderHostDeviceCountTip}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+
+                <!-- Host row menu -->
+                <DataGridTemplateColumn Width="40"
+                                        CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:HostItem">
+                            <Button Classes="menuButton"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                <Button.Flyout>
+                                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+
+                                        <!-- Edit Host -->
+                                        <MenuItem Header="{lz:Localize MenuEditHostCaption}"
+                                                  Click="OnEditClick"/>
+
+                                        <Separator />
+
+                                        <!-- Reconnect to Host -->
+                                        <MenuItem Header="{lz:Localize MenuReconnectHostCaption}"
+                                                  Click="OnReconnectClick"/>
+
+                                        <Separator />
+
+                                        <!-- Remove Host -->
+                                        <MenuItem Header="{lz:Localize MenuRemoveHostCaption}"
+                                                  Click="OnRemoveClick"/>
+
+                                    </MenuFlyout>
+                                </Button.Flyout>
+
+                                <!-- Three dots icon -->
+                                <PathIcon Data="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"
+                                          Width="16" Height="16" />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Bottom row with the Close button -->
+        <Border Grid.Row="3"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource SystemBaseLowColor}">
+            <Button Content="{lz:Localize ButtonCloseCaption}"
+                    Classes="accent"
+                    Click="OnDoneClick"
+                    Margin="5,10,10,10"
+                    HorizontalAlignment="Right"/>
+        </Border>
+
+    </Grid>
+</Window>

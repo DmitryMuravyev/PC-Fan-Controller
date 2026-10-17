@@ -1,0 +1,2423 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ButtonApplyCaption" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="ButtonDoneCaption" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="ButtonApplyTip" xml:space="preserve">
+    <value>Apply the changes</value>
+  </data>
+  <data name="ButtonDoneTip" xml:space="preserve">
+    <value>Finish editing</value>
+  </data>
+  <data name="ButtonCancelCaption" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FanDcdcHardwareParameterFullName" xml:space="preserve">
+    <value>DC-DC Regulator</value>
+  </data>
+  <data name="FanDcdcHardwareParameterShortName" xml:space="preserve">
+    <value>DC-DC</value>
+  </data>
+  <data name="FanDetailsHeaderCaption" xml:space="preserve">
+    <value>Fan configuration details</value>
+  </data>
+  <data name="SensorDetailsHeaderCaption" xml:space="preserve">
+    <value>Sensor configuration details</value>
+  </data>
+  <data name="FanDetailsWindowTitle" xml:space="preserve">
+    <value>Fan Details</value>
+  </data>
+  <data name="HostSensorListWindowTitle" xml:space="preserve">
+    <value>Host Sensors</value>
+  </data>
+  <data name="SensorDetailsWindowTitle" xml:space="preserve">
+    <value>Sensor Details</value>
+  </data>
+  <data name="SectionHardwareCapabilitiesName" xml:space="preserve">
+    <value>HARDWARE CAPABILITIES</value>
+  </data>
+  <data name="SectionIdentityName" xml:space="preserve">
+    <value>IDENTITY</value>
+  </data>
+  <data name="VoltageParameterFullFormat" xml:space="preserve">
+    <value>{0:F3} V</value>
+  </data>
+  <data name="VoltageParameterShortFormat" xml:space="preserve">
+    <value>{0:F2} V</value>
+  </data>
+  <data name="TemperatureParameterShortFormat" xml:space="preserve">
+    <value>{0:F2} °</value>
+  </data>
+  <data name="TemperatureParameterTinyFormat" xml:space="preserve">
+    <value>{0:F1} °</value>
+  </data>
+  <data name="TemperatureParameterIntFormat" xml:space="preserve">
+    <value>{0} °</value>
+  </data>
+  <data name="FanMaxVoltageParameterFullName" xml:space="preserve">
+    <value>Max Voltage</value>
+  </data>
+  <data name="FanMaxVoltageParameterTip" xml:space="preserve">
+    <value>Maximum possible fan supply voltage</value>
+  </data>
+  <data name="FanMosfetHardwareParameterFullName" xml:space="preserve">
+    <value>MOSFET On/Off</value>
+  </data>
+  <data name="FanMosfetHardwareParameterShortName" xml:space="preserve">
+    <value>MOSFET On/Off</value>
+  </data>
+  <data name="FanNameParameterFullName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="HostNameParameterFullName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="HostPortParameterFullName" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="HostAddressParameterFullName" xml:space="preserve">
+    <value>Host / IP</value>
+  </data>
+  <data name="SensorNameParameterFullName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="SensorSerialNumberParameterFullName" xml:space="preserve">
+    <value>Serial Number</value>
+  </data>
+  <data name="FanNameParameterTip" xml:space="preserve">
+    <value>Fan name (up to 8 ASCII characters)</value>
+  </data>
+  <data name="HostNameParameterTip" xml:space="preserve">
+    <value>Host name (displayed in Available Device List)</value>
+  </data>
+  <data name="HostPortParameterTip" xml:space="preserve">
+    <value>Host daemon Port (the default one is 51515)</value>
+  </data>
+  <data name="HostAddressParameterTip" xml:space="preserve">
+    <value>Host address (domain name or IP)</value>
+  </data>
+  <data name="HostNameParameterPlaceholder" xml:space="preserve">
+    <value>e.g. Server Room A</value>
+  </data>
+  <data name="HostAddressParameterPlaceholder" xml:space="preserve">
+    <value>e.g. 192.168.1.10</value>
+  </data>
+  <data name="SensorNameParameterTip" xml:space="preserve">
+    <value>Sensor name (up to 8 ASCII characters)</value>
+  </data>
+  <data name="SectionPowerMetricsName" xml:space="preserve">
+    <value>HARDWARE POWER CONTROL METRICS</value>
+  </data>
+  <data name="FanPwmHardwareParameterFullName" xml:space="preserve">
+    <value>PWM Driver</value>
+  </data>
+  <data name="FanPwmHardwareParameterShortName" xml:space="preserve">
+    <value>PWM</value>
+  </data>
+  <data name="FanTachometerHardwareParameterFullName" xml:space="preserve">
+    <value>Tachometer</value>
+  </data>
+  <data name="FanTachometerHardwareParameterShortName" xml:space="preserve">
+    <value>TACH</value>
+  </data>
+  <data name="UnsavedChangesCaption" xml:space="preserve">
+    <value>(!) Unsaved changes</value>
+  </data>
+  <data name="FanVoltmeterHardwareParameterFullName" xml:space="preserve">
+    <value>Voltmeter</value>
+  </data>
+  <data name="FanVoltmeterHardwareParameterShortName" xml:space="preserve">
+    <value>Voltmeter</value>
+  </data>
+  <data name="FanMinVoltageParameterFullName" xml:space="preserve">
+    <value>Min Voltage</value>
+  </data>
+  <data name="FanMinVoltageParameterTip" xml:space="preserve">
+    <value>Minimum possible fan supply voltage</value>
+  </data>
+  <data name="FanMaxVoltageControlParameterFullName" xml:space="preserve">
+    <value>Max Voltage DC-DC Control</value>
+  </data>
+  <data name="FanMaxVoltageControlParameterTip" xml:space="preserve">
+    <value>DC-DC Control Setting for maximum voltage</value>
+  </data>
+  <data name="FanMinVoltageControlParameterFullName" xml:space="preserve">
+    <value>Min Voltage DC-DC Control</value>
+  </data>
+  <data name="SectionConnectedFanName" xml:space="preserve">
+    <value>CONNECTED FAN PARAMETERS</value>
+  </data>
+  <data name="SwitchYesCaption" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="SwitchOnCaption" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="SwitchNoCaption" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="FanConnectedParameterFullName" xml:space="preserve">
+    <value>Fan Connected</value>
+  </data>
+  <data name="FanTachometerParameterFullName" xml:space="preserve">
+    <value>Tachometer Output</value>
+  </data>
+  <data name="FanTachometerParameterShortName" xml:space="preserve">
+    <value>3rd Wire</value>
+  </data>
+  <data name="FanTachometerParameterTip" xml:space="preserve">
+    <value>3-Wire fan detected</value>
+  </data>
+  <data name="FanIndexParameterFullName" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="SensorIndexParameterFullName" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="FanIndexParameterTip" xml:space="preserve">
+    <value>Internal fan index in the controller</value>
+  </data>
+  <data name="SensorIndexParameterTip" xml:space="preserve">
+    <value>Internal sensor index in the controller</value>
+  </data>
+  <data name="FanPwmParameterFullName" xml:space="preserve">
+    <value>PWM Input</value>
+  </data>
+  <data name="FanPwmParameterShortName" xml:space="preserve">
+    <value>4th Wire</value>
+  </data>
+  <data name="FanPowerControlConfirmedParameterFullName" xml:space="preserve">
+    <value>PWR Functionality Confirmed</value>
+  </data>
+  <data name="FanPwmControlConfirmedParameterFullName" xml:space="preserve">
+    <value>PWM Functionality Confirmed</value>
+  </data>
+  <data name="FanPwmFreewheelTachometerParameterFullName" xml:space="preserve">
+    <value>PWM Freewheel Tachometer</value>
+  </data>
+  <data name="FanPwmExcessiveFullSpeedParameterFullName" xml:space="preserve">
+    <value>PWM Excessive Full Speed</value>
+  </data>
+  <data name="FanModelSizeSizeUnknownValue" xml:space="preserve">
+    <value>Unknown size</value>
+  </data>
+  <data name="FanModelSizeSizeUnknownShortValue" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="FanSizeParameterFullName" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="FanSizeParameterTip" xml:space="preserve">
+    <value>Detected fan Size (experimental)</value>
+  </data>
+  <data name="FanModelSizeSizeSmallValue" xml:space="preserve">
+    <value>Small-size</value>
+  </data>
+  <data name="FanModelSizeSizeSmallShortValue" xml:space="preserve">
+    <value>Small</value>
+  </data>
+  <data name="FanModelSizeSizeMediumValue" xml:space="preserve">
+    <value>Medium-size</value>
+  </data>
+  <data name="FanModelSizeSizeMediumShortValue" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="FanModelSizeSizeLargeValue" xml:space="preserve">
+    <value>Large-size</value>
+  </data>
+  <data name="FanModelSizeSizeLargeShortValue" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="FanModelPowerPowerUnknownValue" xml:space="preserve">
+    <value>Unknown power</value>
+  </data>
+  <data name="FanModelPowerPowerUnknownShortValue" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="FanModelPowerPowerLowValue" xml:space="preserve">
+    <value>Low-power</value>
+  </data>
+  <data name="FanModelPowerPowerLowShortValue" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="FanModelPowerPowerLargeValue" xml:space="preserve">
+    <value>Large-power</value>
+  </data>
+  <data name="FanModelPowerPowerLargeShortValue" xml:space="preserve">
+    <value>Large</value>
+  </data>
+  <data name="FanModelClassClassUnknownValue" xml:space="preserve">
+    <value>Unknown Class</value>
+  </data>
+  <data name="FanModelClassClassUnknownShortValue" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="FanModelClassClassMicroValue" xml:space="preserve">
+    <value>Micro-class</value>
+  </data>
+  <data name="FanModelClassClassMicroShortValue" xml:space="preserve">
+    <value>Micro</value>
+  </data>
+  <data name="FanModelClassClassDesktopValue" xml:space="preserve">
+    <value>Desktop-class</value>
+  </data>
+  <data name="FanModelClassClassDesktopShortValue" xml:space="preserve">
+    <value>Desktop</value>
+  </data>
+  <data name="FanModelClassClassServerValue" xml:space="preserve">
+    <value>Server-class</value>
+  </data>
+  <data name="FanModelClassClassServerShortValue" xml:space="preserve">
+    <value>Server</value>
+  </data>
+  <data name="FanClassParameterFullName" xml:space="preserve">
+    <value>Class</value>
+  </data>
+  <data name="FanClassParameterTip" xml:space="preserve">
+    <value>Detected fan Class (experimental)</value>
+  </data>
+  <data name="FanPowerParameterFullName" xml:space="preserve">
+    <value>Power</value>
+  </data>
+  <data name="FanPowerParameterTip" xml:space="preserve">
+    <value>Detected fan Power (experimental)</value>
+  </data>
+  <data name="FanModelPowerPowerMediumValue" xml:space="preserve">
+    <value>Medium-power</value>
+  </data>
+  <data name="FanModelPowerPowerMediumShortValue" xml:space="preserve">
+    <value>Medium</value>
+  </data>
+  <data name="FanMaxSpeedParameterFullName" xml:space="preserve">
+    <value>Max Speed (RPM)</value>
+  </data>
+  <data name="FanPenultimateSpeedParameterFullName" xml:space="preserve">
+    <value>PWM Penultimate Speed (RPM)</value>
+  </data>
+  <data name="FanPwmMinSpeedParameterFullName" xml:space="preserve">
+    <value>PWM Min Speed (RPM)</value>
+  </data>
+  <data name="FanPwmMinControlParameterFullName" xml:space="preserve">
+    <value>PWM Min Control</value>
+  </data>
+  <data name="FanPwrMinSpeedParameterFullName" xml:space="preserve">
+    <value>PWR Min Speed (RPM)</value>
+  </data>
+  <data name="FanPwrMinControlParameterFullName" xml:space="preserve">
+    <value>PWR Min Control</value>
+  </data>
+  <data name="FanPprParameterFullName" xml:space="preserve">
+    <value>Tach PPR (pulses/revolution)</value>
+  </data>
+  <data name="FanPwmSpinParameterFullName" xml:space="preserve">
+    <value>Spin-up Power (PWM)</value>
+  </data>
+  <data name="FanPwmSpinParameterTip" xml:space="preserve">
+    <value>Fan spin-up power percentage for PWM Control Mode</value>
+  </data>
+  <data name="FanPwrSpinParameterTip" xml:space="preserve">
+    <value>Fan spin-up power percentage for Power (DC-DC) Control Mode</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower0Value" xml:space="preserve">
+    <value>0 %</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower0ShortValue" xml:space="preserve">
+    <value>0%</value>
+  </data>
+  <data name="FanOptionSpinPowerShortFormatPWM" xml:space="preserve">
+    <value>PWM SpinUp {0}</value>
+  </data>
+  <data name="FanOptionSpinPowerShortFormatPWR" xml:space="preserve">
+    <value>PWR SpinUp {0}</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower25Value" xml:space="preserve">
+    <value>25 %</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower25ShortValue" xml:space="preserve">
+    <value>25%</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower50Value" xml:space="preserve">
+    <value>50 %</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower50ShortValue" xml:space="preserve">
+    <value>50%</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower100Value" xml:space="preserve">
+    <value>100 %</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower100ShortValue" xml:space="preserve">
+    <value>100%</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower75Value" xml:space="preserve">
+    <value>75 %</value>
+  </data>
+  <data name="FanOptionSpinPowerSpinPower75ShortValue" xml:space="preserve">
+    <value>75%</value>
+  </data>
+  <data name="FanPwrSpinParameterFullName" xml:space="preserve">
+    <value>Spin-up Power (PWR)</value>
+  </data>
+  <data name="FanOptionRocRoc1Value" xml:space="preserve">
+    <value>655s (super slow)</value>
+  </data>
+  <data name="FanOptionRocShortFormat" xml:space="preserve">
+    <value>ROC: {0}</value>
+  </data>
+  <data name="FanOptionRocRoc1ShortValue" xml:space="preserve">
+    <value>655s</value>
+  </data>
+  <data name="FanOptionRocRoc2Value" xml:space="preserve">
+    <value>328s (super slow)</value>
+  </data>
+  <data name="FanOptionRocRoc4Value" xml:space="preserve">
+    <value>164s (very slow)</value>
+  </data>
+  <data name="FanOptionRocRoc8Value" xml:space="preserve">
+    <value>82s (very slow)</value>
+  </data>
+  <data name="FanOptionRocRoc8ShortValue" xml:space="preserve">
+    <value>82s</value>
+  </data>
+  <data name="FanOptionRocRoc16Value" xml:space="preserve">
+    <value>41s (slow)</value>
+  </data>
+  <data name="FanOptionRocRoc16ShortValue" xml:space="preserve">
+    <value>41s</value>
+  </data>
+  <data name="FanOptionRocRoc32Value" xml:space="preserve">
+    <value>20.5s (slow)</value>
+  </data>
+  <data name="FanOptionRocRoc32ShortValue" xml:space="preserve">
+    <value>20.5s</value>
+  </data>
+  <data name="FanOptionRocRoc64Value" xml:space="preserve">
+    <value>10.2s</value>
+  </data>
+  <data name="FanOptionRocRoc64ShortValue" xml:space="preserve">
+    <value>10.2s</value>
+  </data>
+  <data name="FanOptionRocRoc128Value" xml:space="preserve">
+    <value>5.1s</value>
+  </data>
+  <data name="FanOptionRocRoc128ShortValue" xml:space="preserve">
+    <value>5.1s</value>
+  </data>
+  <data name="FanOptionRocRoc256Value" xml:space="preserve">
+    <value>2.56s</value>
+  </data>
+  <data name="FanOptionRocRoc256ShortValue" xml:space="preserve">
+    <value>2.56s</value>
+  </data>
+  <data name="FanOptionRocRoc512Value" xml:space="preserve">
+    <value>1.28s (default)</value>
+  </data>
+  <data name="FanOptionRocRoc512ShortValue" xml:space="preserve">
+    <value>1.28s</value>
+  </data>
+  <data name="FanOptionRocRoc1024Value" xml:space="preserve">
+    <value>0.64s</value>
+  </data>
+  <data name="FanOptionRocRoc1024ShortValue" xml:space="preserve">
+    <value>0.64s</value>
+  </data>
+  <data name="FanOptionRocRoc2048Value" xml:space="preserve">
+    <value>0.32s</value>
+  </data>
+  <data name="FanOptionRocRoc2048ShortValue" xml:space="preserve">
+    <value>0.32s</value>
+  </data>
+  <data name="FanOptionRocRoc4096Value" xml:space="preserve">
+    <value>0.16s (fast)</value>
+  </data>
+  <data name="FanOptionRocRoc4096ShortValue" xml:space="preserve">
+    <value>0.16s</value>
+  </data>
+  <data name="FanOptionRocRoc8192Value" xml:space="preserve">
+    <value>0.08s (very fast)</value>
+  </data>
+  <data name="FanOptionRocRoc8192ShortValue" xml:space="preserve">
+    <value>0.08s</value>
+  </data>
+  <data name="FanOptionRocRoc16384Value" xml:space="preserve">
+    <value>0.04s (super fast)</value>
+  </data>
+  <data name="FanOptionRocRoc16384ShortValue" xml:space="preserve">
+    <value>0.04s</value>
+  </data>
+  <data name="FanOptionRocRocDisabledValue" xml:space="preserve">
+    <value>0s (instantaneous)</value>
+  </data>
+  <data name="FanOptionRocRocDisabledShortValue" xml:space="preserve">
+    <value>0s</value>
+  </data>
+  <data name="FanRocParameterFullName" xml:space="preserve">
+    <value>Control Rate-of-Change</value>
+  </data>
+  <data name="FanPwmPidEnabledParameterFullName" xml:space="preserve">
+    <value>PID Enabled (PWM)</value>
+  </data>
+  <data name="FanPwrPidEnabledParameterFullName" xml:space="preserve">
+    <value>PID Enabled (PWR)</value>
+  </data>
+  <data name="FanPwmPidSlowParameterFullName" xml:space="preserve">
+    <value>PID Slow Mode (PWM)</value>
+  </data>
+  <data name="FanPwrPidSlowParameterFullName" xml:space="preserve">
+    <value>PID Slow Mode (PWR)</value>
+  </data>
+  <data name="FanAlwaysOnParameterFullName" xml:space="preserve">
+    <value>Always ON</value>
+  </data>
+  <data name="FanControlModeParameterFullName" xml:space="preserve">
+    <value>Control Mode</value>
+  </data>
+  <data name="FanControlModeParameterTip" xml:space="preserve">
+    <value>Fan Control Mode (PWM, DC-DC, On/Off or Disabled)</value>
+  </data>
+  <data name="FanOperationModeParameterFullName" xml:space="preserve">
+    <value>Operation Mode</value>
+  </data>
+  <data name="FanPowerProfileParameterFullName" xml:space="preserve">
+    <value>Power Range (Profile)</value>
+  </data>
+  <data name="FanPowerProfileParameterTip" xml:space="preserve">
+    <value>The power range in which the fan will operate</value>
+  </data>
+  <data name="FanPowerProfileParameterShortName" xml:space="preserve">
+    <value>Power Profile</value>
+  </data>
+  <data name="FanControlModeControlDisabledValue" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="FanControlModeControlPWMValue" xml:space="preserve">
+    <value>PWM</value>
+  </data>
+  <data name="FanControlModeControlDCDCValue" xml:space="preserve">
+    <value>Power</value>
+  </data>
+  <data name="FanControlModeControlONOFFValue" xml:space="preserve">
+    <value>MOSFET On/Off</value>
+  </data>
+  <data name="FanOperationModeOperationNormalValue" xml:space="preserve">
+    <value>By Sensors</value>
+  </data>
+  <data name="FanOperationModeOperationManualValue" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="FanOperationModeOperationSilentValue" xml:space="preserve">
+    <value>Silent</value>
+  </data>
+  <data name="FanOperationModeOperationTurboValue" xml:space="preserve">
+    <value>Turbo</value>
+  </data>
+  <data name="FanPowerProfileProfileEasyValue" xml:space="preserve">
+    <value>Easy Peasy</value>
+  </data>
+  <data name="FanPowerProfileProfileChillValue" xml:space="preserve">
+    <value>Chill</value>
+  </data>
+  <data name="FanPowerProfileProfileNormalValue" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="FanPowerProfileProfileBusyValue" xml:space="preserve">
+    <value>Busy</value>
+  </data>
+  <data name="FanPowerProfileProfileHardValue" xml:space="preserve">
+    <value>Hardcore</value>
+  </data>
+  <data name="FanPowerProfileProfileCustomValue" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="ButtonResetCaption" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="ButtonSaveConfigCaption" xml:space="preserve">
+    <value>Save to Device</value>
+  </data>
+  <data name="DialogItemConfigNotSavedHeaderFormat" xml:space="preserve">
+    <value>'{0}' Configuration</value>
+  </data>
+  <data name="DialogSystemConfigNotSavedHeaderFormat" xml:space="preserve">
+    <value>System Configuration</value>
+  </data>
+  <data name="DialogConfigNotSavedDiscardMessageFormat" xml:space="preserve">
+    <value>Changes will not be saved.
+Close anyway?</value>
+  </data>
+  <data name="FanDefaultNameFormat" xml:space="preserve">
+    <value>Fan {0}</value>
+  </data>
+  <data name="SensorDefaultNameFormat" xml:space="preserve">
+    <value>Sensor {0}</value>
+  </data>
+  <data name="DialogConfigNotSavedConfirmMessageFormat" xml:space="preserve">
+    <value>Confirm Saving the Configuration to the Device.</value>
+  </data>
+  <data name="ButtonCloseCaption" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ButtonAddSelectedCaption" xml:space="preserve">
+    <value>Add Selected</value>
+  </data>
+  <data name="ButtonAddSelectedTip" xml:space="preserve">
+    <value>Add selected Host sensor (programmatically transmitted from the host)</value>
+  </data>
+  <data name="ButtonSaveCaption" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ButtonOperationModeSilentCaption" xml:space="preserve">
+    <value>Silent</value>
+  </data>
+  <data name="ButtonOperationModeNormalCaption" xml:space="preserve">
+    <value>Sensor Controlled</value>
+  </data>
+  <data name="ButtonOperationModeSilentTip" xml:space="preserve">
+    <value>Switch the selected fan(s) to Silent mode</value>
+  </data>
+  <data name="ButtonOperationModeNormalTip" xml:space="preserve">
+    <value>Switch the selected fan(s) to Sensor-controlled mode</value>
+  </data>
+  <data name="ButtonOperationModeManualCaption" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ButtonOperationModeManualTip" xml:space="preserve">
+    <value>Switch the selected fan(s) to Manual mode</value>
+  </data>
+  <data name="ButtonOperationModeTurboCaption" xml:space="preserve">
+    <value>Turbo</value>
+  </data>
+  <data name="ButtonOperationModeTurboTip" xml:space="preserve">
+    <value>Switch the selected fan(s) to Turbo mode</value>
+  </data>
+  <data name="ButtonPowerProfileMenuTip" xml:space="preserve">
+    <value>Set Power Profile for selected fan(s)</value>
+  </data>
+  <data name="ButtonPowerProfileMenuCaption" xml:space="preserve">
+    <value>Power Profile</value>
+  </data>
+  <data name="ButtonResetFanCaption" xml:space="preserve">
+    <value>Reset State</value>
+  </data>
+  <data name="ButtonResetSensorCaption" xml:space="preserve">
+    <value>Reset State</value>
+  </data>
+  <data name="MenuResetFanCaption" xml:space="preserve">
+    <value>Reset State</value>
+  </data>
+  <data name="MenuResetSensorCaption" xml:space="preserve">
+    <value>Reset State</value>
+  </data>
+  <data name="ButtonResetFanTip" xml:space="preserve">
+    <value>Reset selected fan(s) state</value>
+  </data>
+  <data name="ButtonResetSensorTip" xml:space="preserve">
+    <value>Reset selected sensor(s) state</value>
+  </data>
+  <data name="ButtonRescanHardwareCaption" xml:space="preserve">
+    <value>Rescan Hardware</value>
+  </data>
+  <data name="MenuRescanHardwareCaption" xml:space="preserve">
+    <value>Rescan Hardware</value>
+  </data>
+  <data name="ButtonRescanAllHardwareCaption" xml:space="preserve">
+    <value>Scan All Hardware</value>
+  </data>
+  <data name="ButtonRescanHardwareTip" xml:space="preserve">
+    <value>Start the fan hardware scanning process (about one minute)</value>
+  </data>
+  <data name="ButtonRescanAllHardwareTip" xml:space="preserve">
+    <value>Start the hardware scanning process for all fans (up to 5 minutes)</value>
+  </data>
+  <data name="ButtonRescanFanCaption" xml:space="preserve">
+    <value>Rescan Fan</value>
+  </data>
+  <data name="MenuRescanFanCaption" xml:space="preserve">
+    <value>Rescan Fan</value>
+  </data>
+  <data name="ButtonRescanAllFansCaption" xml:space="preserve">
+    <value>Scan All Fans</value>
+  </data>
+  <data name="ButtonRescanFanTip" xml:space="preserve">
+    <value>Start the fan scanning process (up to 10 minutes per fan)</value>
+  </data>
+  <data name="ButtonRescanAllFansTip" xml:space="preserve">
+    <value>Start the fan scanning process for all fans (up to 60 minutes)</value>
+  </data>
+  <data name="ColumnHeaderFanNameCaption" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ColumnHeaderHostNameCaption" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ColumnHeaderHostAddressCaption" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="ColumnHeaderHostPortCaption" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="ColumnHeaderSensorNameCaption" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ColumnHeaderFanNameTip" xml:space="preserve">
+    <value>Configured Fan Name</value>
+  </data>
+  <data name="ColumnHeaderHostNameTip" xml:space="preserve">
+    <value>Configured Host Name</value>
+  </data>
+  <data name="ColumnHeaderHostAddressTip" xml:space="preserve">
+    <value>Configured Host Address (domain or IP)</value>
+  </data>
+  <data name="ColumnHeaderHostPortTip" xml:space="preserve">
+    <value>Configured Host daemon Port</value>
+  </data>
+  <data name="ColumnHeaderSensorNameTip" xml:space="preserve">
+    <value>Configured Sensor Name</value>
+  </data>
+  <data name="ColumnHeaderFanStatusCaption" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ColumnHeaderSensorStatusCaption" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ColumnHeaderFanStatusTip" xml:space="preserve">
+    <value>Complex fan status</value>
+  </data>
+  <data name="ColumnHeaderSensorStatusTip" xml:space="preserve">
+    <value>Complex sensor status</value>
+  </data>
+  <data name="FanStatusStatusFailedValue" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="FanStatusStatusDisabledValue" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="SensorStatusStatusDisabledValue" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="FanStatusStatusRunningValue" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="SensorStatusStatusValidValue" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="SensorStatusStatusOutdatedValue" xml:space="preserve">
+    <value>Outdated</value>
+  </data>
+  <data name="FanStatusStatusHaltedValue" xml:space="preserve">
+    <value>Halted</value>
+  </data>
+  <data name="FanStatusStatusScanningValue" xml:space="preserve">
+    <value>Scanning</value>
+  </data>
+  <data name="FanStatusStatusPreWarmingValue" xml:space="preserve">
+    <value>Priming</value>
+  </data>
+  <data name="FanStatusStatusWarmingValue" xml:space="preserve">
+    <value>Ramping</value>
+  </data>
+  <data name="FanStatusStatusWarningValue" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="SensorStatusStatusWarningValue" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="FanStatusStatusErrorValue" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ColumnHeaderFanErrorsCaption" xml:space="preserve">
+    <value>Errors</value>
+  </data>
+  <data name="ColumnHeaderSensorErrorsCaption" xml:space="preserve">
+    <value>Errors</value>
+  </data>
+  <data name="ColumnHeaderFanErrorsTip" xml:space="preserve">
+    <value>Fan total errors count</value>
+  </data>
+  <data name="ColumnHeaderSensorErrorsTip" xml:space="preserve">
+    <value>Sensor total errors count</value>
+  </data>
+  <data name="ColumnHeaderFanModesCaption" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ColumnHeaderFanModesTip" xml:space="preserve">
+    <value>Control and Operation Modes indicator</value>
+  </data>
+  <data name="ColumnHeaderSensorTypeTip" xml:space="preserve">
+    <value>Temperature sensor type</value>
+  </data>
+  <data name="FanControlModeControlDisabledTip" xml:space="preserve">
+    <value>Control Disabled</value>
+  </data>
+  <data name="FanControlModeControlPWMTip" xml:space="preserve">
+    <value>Controlled by PWM</value>
+  </data>
+  <data name="FanControlModeControlDCDCTip" xml:space="preserve">
+    <value>Controlled by DC-DC Voltage</value>
+  </data>
+  <data name="FanControlModeControlONOFFTip" xml:space="preserve">
+    <value>Controlled by MOSFET Power On/Off</value>
+  </data>
+  <data name="FanOperationModeOperationNormalTip" xml:space="preserve">
+    <value>The fan is controlled by temperature sensors</value>
+  </data>
+  <data name="FanOperationModeOperationManualTip" xml:space="preserve">
+    <value>The fan is controlled manually</value>
+  </data>
+  <data name="FanOperationModeOperationSilentTip" xml:space="preserve">
+    <value>The fan operates at minimum speed</value>
+  </data>
+  <data name="FanOperationModeOperationTurboTip" xml:space="preserve">
+    <value>The fan operates at maximum speed</value>
+  </data>
+  <data name="ColumnHeaderFanPowerProfileCaption" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="ColumnHeaderFanPowerProfileTip" xml:space="preserve">
+    <value>Power Profile (operating range) of the fan</value>
+  </data>
+  <data name="ColumnHeaderFanControlValueCaption" xml:space="preserve">
+    <value>Control</value>
+  </data>
+  <data name="ColumnHeaderFanControlValueTip" xml:space="preserve">
+    <value>The current value of the Power Control parameter calculated based on the Power Profile and Power Setting</value>
+  </data>
+  <data name="ColumnHeaderFanControlSettingCaption" xml:space="preserve">
+    <value>Setting</value>
+  </data>
+  <data name="ColumnHeaderFanControlSettingTip" xml:space="preserve">
+    <value>Power Setting</value>
+  </data>
+  <data name="ColumnHeaderFanVoltageCaption" xml:space="preserve">
+    <value>Voltage</value>
+  </data>
+  <data name="ColumnHeaderFanVoltageTip" xml:space="preserve">
+    <value>Current Fan Power Supply Voltage</value>
+  </data>
+  <data name="ColumnHeaderFanSpeedCaption" xml:space="preserve">
+    <value>RPM</value>
+  </data>
+  <data name="ColumnHeaderSensorTemperatureCaption" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="ColumnHeaderFanSpeedTip" xml:space="preserve">
+    <value>Current fan speed</value>
+  </data>
+  <data name="ColumnHeaderSensorTemperatureTip" xml:space="preserve">
+    <value>Current temperature °C</value>
+  </data>
+  <data name="FanOptionRocRoc4ShortValue" xml:space="preserve">
+    <value>164s</value>
+  </data>
+  <data name="FanOptionRocRoc2ShortValue" xml:space="preserve">
+    <value>328s</value>
+  </data>
+  <data name="MenuDetailsCaption" xml:space="preserve">
+    <value>Details...</value>
+  </data>
+  <data name="FanPwmParameterTip" xml:space="preserve">
+    <value>4-Wire fan detected</value>
+  </data>
+  <data name="FanPwmHardwareParameterTip" xml:space="preserve">
+    <value>Controller's PWM hardware available</value>
+  </data>
+  <data name="FanTachometerHardwareParameterTip" xml:space="preserve">
+    <value>Controller's Tachometer hardware available</value>
+  </data>
+  <data name="FanVoltmeterHardwareParameterTip" xml:space="preserve">
+    <value>Controller's Voltmeter hardware available</value>
+  </data>
+  <data name="FanMosfetHardwareParameterTip" xml:space="preserve">
+    <value>Controller's MOSFET On/Off hardware available</value>
+  </data>
+  <data name="FanDcdcHardwareParameterTip" xml:space="preserve">
+    <value>Controller's DC-DC hardware available</value>
+  </data>
+  <data name="FanConnectedParameterShortName" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="FanConnectedParameterTip" xml:space="preserve">
+    <value>Connected fan detected (2 wires and more)</value>
+  </data>
+  <data name="FanPwmFreewheelTachometerParameterShortName" xml:space="preserve">
+    <value>Tach+</value>
+  </data>
+  <data name="FanPwmFreewheelTachometerParameterTip" xml:space="preserve">
+    <value>The tachometer is functional at zero PWM</value>
+  </data>
+  <data name="FanAlwaysOnParameterShortName" xml:space="preserve">
+    <value>Always ON</value>
+  </data>
+  <data name="FanAlwaysOnParameterTip" xml:space="preserve">
+    <value>The fan is never switched off, even when the sensors are overcooled</value>
+  </data>
+  <data name="FanPprParameterShortFormat" xml:space="preserve">
+    <value>Tach PPR: {0}</value>
+  </data>
+  <data name="FanPprParameterShortTip" xml:space="preserve">
+    <value>Tachometer Pulses-Per-Revolution (PPR)</value>
+  </data>
+  <data name="FanMaxSpeedParameterShortFormat" xml:space="preserve">
+    <value>Max Speed: {0}</value>
+  </data>
+  <data name="FanMaxSpeedParameterTip" xml:space="preserve">
+    <value>Maximum fan speed</value>
+  </data>
+  <data name="FanPenultimateSpeedParameterShortFormat" xml:space="preserve">
+    <value>Hi Speed: {0}</value>
+  </data>
+  <data name="FanPenultimateSpeedParameterTip" xml:space="preserve">
+    <value>Sub-maximum fan speed (PWM only)</value>
+  </data>
+  <data name="FanPwmMinSpeedParameterShortFormat" xml:space="preserve">
+    <value>PWM Min Spd: {0}</value>
+  </data>
+  <data name="FanPwmMinSpeedParameterTip" xml:space="preserve">
+    <value>PWM-controlled minimum fan speed</value>
+  </data>
+  <data name="FanPwrMinSpeedParameterShortFormat" xml:space="preserve">
+    <value>PWR Min Spd: {0}</value>
+  </data>
+  <data name="FanPwrMinSpeedParameterTip" xml:space="preserve">
+    <value>Power-controlled (DC-DC) minimum fan speed</value>
+  </data>
+  <data name="FanPwmPidEnabledParameterShortName" xml:space="preserve">
+    <value>PWM PID</value>
+  </data>
+  <data name="FanPwmPidEnabledParameterTip" xml:space="preserve">
+    <value>PID enabled for PWM Control Mode</value>
+  </data>
+  <data name="FanPwrPidEnabledParameterShortName" xml:space="preserve">
+    <value>PWR PID</value>
+  </data>
+  <data name="FanPwrPidEnabledParameterTip" xml:space="preserve">
+    <value>PID enabled for Power (DC-DC) Control Mode</value>
+  </data>
+  <data name="FanPwmPidSlowParameterShortName" xml:space="preserve">
+    <value>PWM PID Slow</value>
+  </data>
+  <data name="FanPwmPidSlowParameterTip" xml:space="preserve">
+    <value>Slow PID response option for PWM Control Mode</value>
+  </data>
+  <data name="FanPwrPidSlowParameterShortName" xml:space="preserve">
+    <value>PWR PID Slow</value>
+  </data>
+  <data name="FanPwrPidSlowParameterTip" xml:space="preserve">
+    <value>Slow PID response option for Power (DC-DC) Control Mode</value>
+  </data>
+  <data name="FanRocParameterTip" xml:space="preserve">
+    <value>Fan Control Value Rate-Of-Change (ROC) parameter</value>
+  </data>
+  <data name="FanOperationModeParameterTip" xml:space="preserve">
+    <value>Fan Operation Mode (By sensors, Manual, Silent or Turbo)</value>
+  </data>
+  <data name="FanMinVoltageControlParameterTip" xml:space="preserve">
+    <value>DC-DC Control Setting for minimum voltage</value>
+  </data>
+  <data name="FanPowerControlConfirmedParameterTip" xml:space="preserve">
+    <value>Confirmation of Power control functionality by testing</value>
+  </data>
+  <data name="FanPwmControlConfirmedParameterTip" xml:space="preserve">
+    <value>Confirmation of PWM control functionality by testing</value>
+  </data>
+  <data name="FanPwmExcessiveFullSpeedParameterTip" xml:space="preserve">
+    <value>Fan speed increases non-linearly when reaching 100% PWM</value>
+  </data>
+  <data name="FanPwmMinControlParameterTip" xml:space="preserve">
+    <value>PWM Control Setting for minimum fan speed</value>
+  </data>
+  <data name="FanPwrMinControlParameterTip" xml:space="preserve">
+    <value>DC-DC Control Setting for minimum fan speed</value>
+  </data>
+  <data name="FanStatusPwmHardwareErrorShortName" xml:space="preserve">
+    <value>PWM HW Err</value>
+  </data>
+  <data name="FanStatusPwmHardwareErrorTip" xml:space="preserve">
+    <value>PWM hardware error</value>
+  </data>
+  <data name="FanStatusTachometerHardwareErrorShortName" xml:space="preserve">
+    <value>TACH HW Err</value>
+  </data>
+  <data name="FanStatusTachometerHardwareErrorTip" xml:space="preserve">
+    <value>Tachometer hardware error</value>
+  </data>
+  <data name="FanStatusVoltmeterHardwareErrorShortName" xml:space="preserve">
+    <value>Voltmeter HW Err</value>
+  </data>
+  <data name="FanStatusVoltmeterHardwareErrorTip" xml:space="preserve">
+    <value>Voltmeter hardware error</value>
+  </data>
+  <data name="FanStatusMosfetHardwareErrorShortName" xml:space="preserve">
+    <value>MOSFET HW Err</value>
+  </data>
+  <data name="FanStatusMosfetHardwareErrorTip" xml:space="preserve">
+    <value>MOSFET hardware error</value>
+  </data>
+  <data name="FanStatusDcdcHardwareErrorShortName" xml:space="preserve">
+    <value>DC-DC HW Err</value>
+  </data>
+  <data name="FanStatusDcdcHardwareErrorTip" xml:space="preserve">
+    <value>DC-DC hardware error</value>
+  </data>
+  <data name="FanStatusLowSpeedShortName" xml:space="preserve">
+    <value>Low RPM</value>
+  </data>
+  <data name="FanStatusLowPowerShortName" xml:space="preserve">
+    <value>Low Power</value>
+  </data>
+  <data name="FanStatusLowSpeedTip" xml:space="preserve">
+    <value>Low fan speed</value>
+  </data>
+  <data name="FanStatusLowPowerTip" xml:space="preserve">
+    <value>Low power supply voltage</value>
+  </data>
+  <data name="FanStatusCriticallyLowSpeedTip" xml:space="preserve">
+    <value>Critically low fan speed</value>
+  </data>
+  <data name="FanStatusCriticallyLowPowerTip" xml:space="preserve">
+    <value>Critically low power supply voltage</value>
+  </data>
+  <data name="FanStatusCriticallyLowSpeedShortName" xml:space="preserve">
+    <value>Critical RPM</value>
+  </data>
+  <data name="FanStatusCriticallyLowPowerShortName" xml:space="preserve">
+    <value>Critical Power</value>
+  </data>
+  <data name="FanStatusFatalFailureShortName" xml:space="preserve">
+    <value>Fatal Failure</value>
+  </data>
+  <data name="FanStatusFatalFailureTip" xml:space="preserve">
+    <value>Fan fatal failure</value>
+  </data>
+  <data name="FanStatusRunningShortName" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="FanStatusRunningTip" xml:space="preserve">
+    <value>Fan running</value>
+  </data>
+  <data name="FanStatusSpinningUpShortName" xml:space="preserve">
+    <value>Spin-up</value>
+  </data>
+  <data name="FanStatusSpinningUpTip" xml:space="preserve">
+    <value>Fan spinning up</value>
+  </data>
+  <data name="FanStatusSpinUpFailedShortName" xml:space="preserve">
+    <value>Spin-up Failed</value>
+  </data>
+  <data name="FanStatusSpinUpFailedTip" xml:space="preserve">
+    <value>Fan failed to spin up</value>
+  </data>
+  <data name="FanStatusPidSuspendedShortName" xml:space="preserve">
+    <value>PID Suspended</value>
+  </data>
+  <data name="FanStatusPidSuspendedTip" xml:space="preserve">
+    <value>PID temporarily suspended</value>
+  </data>
+  <data name="FanStatusActionRequiredShortName" xml:space="preserve">
+    <value>Awaiting PID</value>
+  </data>
+  <data name="FanStatusActionRequiredTip" xml:space="preserve">
+    <value>PID action required</value>
+  </data>
+  <data name="FanStatusOkShortName" xml:space="preserve">
+    <value>All OK</value>
+  </data>
+  <data name="FanStatusOkTip" xml:space="preserve">
+    <value>All fan parameters are OK</value>
+  </data>
+  <data name="FanStatusHaltedShortName" xml:space="preserve">
+    <value>Halted</value>
+  </data>
+  <data name="FanStatusHaltedTip" xml:space="preserve">
+    <value>Fan is halted by sensors or the user</value>
+  </data>
+  <data name="FanStatusSwitchedOffShortName" xml:space="preserve">
+    <value>Switched Off</value>
+  </data>
+  <data name="FanStatusSwitchedOffTip" xml:space="preserve">
+    <value>Fan is switched off</value>
+  </data>
+  <data name="FanStatusScanningShortName" xml:space="preserve">
+    <value>Scanning</value>
+  </data>
+  <data name="FanStatusWarmingShortName" xml:space="preserve">
+    <value>Pre-warming</value>
+  </data>
+  <data name="FanStatusScanningTip" xml:space="preserve">
+    <value>Fan scanning (Hardware or Model)</value>
+  </data>
+  <data name="FanStatusWarmingTip" xml:space="preserve">
+    <value>The fan is pre-warming before scan procedure</value>
+  </data>
+  <data name="FanStatusFailedShortName" xml:space="preserve">
+    <value>FAN FAILED</value>
+  </data>
+  <data name="FanStatusFailedTip" xml:space="preserve">
+    <value>Fan failed</value>
+  </data>
+  <data name="TabSystemCaption" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="SwitchOffCaption" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="TabFansCaption" xml:space="preserve">
+    <value>Fans</value>
+  </data>
+  <data name="ColumnHeaderNoFansCaption" xml:space="preserve">
+    <value>No Fans</value>
+  </data>
+  <data name="TabSensorsCaption" xml:space="preserve">
+    <value>Sensors</value>
+  </data>
+  <data name="ApplicationTitle" xml:space="preserve">
+    <value>Fan Controller Admin</value>
+  </data>
+  <data name="ControllerConnectedCaption" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="ControllerDisconnectedCaption" xml:space="preserve">
+    <value>No Connection</value>
+  </data>
+  <data name="ControllerSelectionCaption" xml:space="preserve">
+    <value>Controller selection:</value>
+  </data>
+  <data name="ControllerSelectionPlaceholderCaption" xml:space="preserve">
+    <value>No controller selected</value>
+  </data>
+  <data name="SectionControllerSystemStatusName" xml:space="preserve">
+    <value>System Status</value>
+  </data>
+  <data name="SectionControllerConfigStatusName" xml:space="preserve">
+    <value>Configuration Status</value>
+  </data>
+  <data name="ControllerHighPowerParameterShortName" xml:space="preserve">
+    <value>Hi Power:</value>
+  </data>
+  <data name="ControllerDigitalPowerParameterShortName" xml:space="preserve">
+    <value>Digital Power:</value>
+  </data>
+  <data name="ControllerMcuPowerParameterShortName" xml:space="preserve">
+    <value>MCU Power:</value>
+  </data>
+  <data name="ControllerFreeRamParameterShortName" xml:space="preserve">
+    <value>Free RAM:</value>
+  </data>
+  <data name="ControllerHighPowerParameterTip" xml:space="preserve">
+    <value>Power supply voltage for fans</value>
+  </data>
+  <data name="ControllerDigitalPowerParameterTip" xml:space="preserve">
+    <value>Power supply voltage for digital circuit</value>
+  </data>
+  <data name="ControllerMcuPowerParameterTip" xml:space="preserve">
+    <value>MCU Vdd voltage</value>
+  </data>
+  <data name="ControllerFreeRamParameterTip" xml:space="preserve">
+    <value>Available Free RAM Size</value>
+  </data>
+  <data name="MemorySizeParameterShortFormat" xml:space="preserve">
+    <value>{0:F2} KB</value>
+  </data>
+  <data name="ControllerStatusNoConfigShortName" xml:space="preserve">
+    <value>No Config</value>
+  </data>
+  <data name="ControllerStatusNoConfigTip" xml:space="preserve">
+    <value>No Configuration Found</value>
+  </data>
+  <data name="ControllerStatusSensorsOutOfRomShortName" xml:space="preserve">
+    <value>Sns &gt; ROM</value>
+  </data>
+  <data name="ControllerStatusSensorsOutOfRomTip" xml:space="preserve">
+    <value>More Sensors were detected than could be stored in ROM</value>
+  </data>
+  <data name="ControllerStatusSensorsOutOfRamShortName" xml:space="preserve">
+    <value>Sns &gt; RAM</value>
+  </data>
+  <data name="ControllerStatusSensorsOutOfRamTip" xml:space="preserve">
+    <value>Saved Sensors do not fit in RAM</value>
+  </data>
+  <data name="ControllerStatusSensorNotFoundShortName" xml:space="preserve">
+    <value>Sns Missing</value>
+  </data>
+  <data name="ControllerStatusSensorNotFoundTip" xml:space="preserve">
+    <value>The target Sensor for the last operation was not found</value>
+  </data>
+  <data name="ControllerStatusSystemConfigErrorTip" xml:space="preserve">
+    <value>System Configuration is not applicable</value>
+  </data>
+  <data name="ControllerStatusSensorConfigErrorTip" xml:space="preserve">
+    <value>Sensor Configuration is not applicable</value>
+  </data>
+  <data name="ControllerStatusFanConfigErrorTip" xml:space="preserve">
+    <value>Fan Configuration is not applicable</value>
+  </data>
+  <data name="ControllerStatusSystemConfigErrorShortName" xml:space="preserve">
+    <value>Sys Cfg Err</value>
+  </data>
+  <data name="ControllerStatusSensorConfigErrorShortName" xml:space="preserve">
+    <value>Sns Cfg Err</value>
+  </data>
+  <data name="ControllerStatusFanConfigErrorShortName" xml:space="preserve">
+    <value>Fan Cfg Err</value>
+  </data>
+  <data name="ControllerStatusEepromFailureShortName" xml:space="preserve">
+    <value>ROM Failure</value>
+  </data>
+  <data name="ControllerStatusEepromFailureTip" xml:space="preserve">
+    <value>EEPROM writing failure</value>
+  </data>
+  <data name="ControllerStatusHardwareScanErrorShortName" xml:space="preserve">
+    <value>HW Scan Err</value>
+  </data>
+  <data name="ControllerStatusFanScanErrorShortName" xml:space="preserve">
+    <value>Fan Scan Err</value>
+  </data>
+  <data name="ControllerStatusSensorScanErrorShortName" xml:space="preserve">
+    <value>Sns Scan Err</value>
+  </data>
+  <data name="ControllerStatusHardwareScanErrorTip" xml:space="preserve">
+    <value>Hardware scanning failure</value>
+  </data>
+  <data name="ControllerStatusFanScanErrorTip" xml:space="preserve">
+    <value>Fan scan failure</value>
+  </data>
+  <data name="ControllerStatusSensorScanErrorTip" xml:space="preserve">
+    <value>Sensor scan failure</value>
+  </data>
+  <data name="ControllerStatusPreWarmErrorShortName" xml:space="preserve">
+    <value>Pre-warm Err</value>
+  </data>
+  <data name="ControllerStatusPreWarmErrorTip" xml:space="preserve">
+    <value>Fan pre-warm failure</value>
+  </data>
+  <data name="ControllerStatusBadSensorShortName" xml:space="preserve">
+    <value>Bad Sns Cfg</value>
+  </data>
+  <data name="ControllerStatusBadSensorFullName" xml:space="preserve">
+    <value>Sensor Configuration Error</value>
+  </data>
+  <data name="ControllerStatusBadSensorTip" xml:space="preserve">
+    <value>Incorrect Sensor configuration</value>
+  </data>
+  <data name="ControllerStatusLowFanSpeedShortName" xml:space="preserve">
+    <value>Low Fan RPM</value>
+  </data>
+  <data name="ControllerStatusLowFanSpeedFullName" xml:space="preserve">
+    <value>Low Fan Speed</value>
+  </data>
+  <data name="ControllerStatusLowFanPowerShortName" xml:space="preserve">
+    <value>Low Fan PWR</value>
+  </data>
+  <data name="ControllerStatusLowFanPowerFullName" xml:space="preserve">
+    <value>Low Fan Power</value>
+  </data>
+  <data name="ControllerStatusCriticalFanPowerShortName" xml:space="preserve">
+    <value>Critical Fan PWR</value>
+  </data>
+  <data name="ControllerStatusCriticalFanPowerFullName" xml:space="preserve">
+    <value>Fan Power Failure</value>
+  </data>
+  <data name="ControllerStatusLowFanSpeedTip" xml:space="preserve">
+    <value>Fan speed is low</value>
+  </data>
+  <data name="ControllerStatusLowFanPowerTip" xml:space="preserve">
+    <value>The supply voltage of one or more fans is low</value>
+  </data>
+  <data name="ControllerStatusCriticalFanPowerTip" xml:space="preserve">
+    <value>The supply voltage of one or more fans is critically low</value>
+  </data>
+  <data name="ControllerStatusTempWarningShortName" xml:space="preserve">
+    <value>Temp Warning</value>
+  </data>
+  <data name="ControllerStatusTempWarningFullName" xml:space="preserve">
+    <value>High Temperature</value>
+  </data>
+  <data name="ControllerStatusTempWarningTip" xml:space="preserve">
+    <value>High temperature on sensors</value>
+  </data>
+  <data name="ControllerStatusAllOkShortName" xml:space="preserve">
+    <value>All OK</value>
+  </data>
+  <data name="ControllerStatusAllOkTip" xml:space="preserve">
+    <value>All System Parameters are OK</value>
+  </data>
+  <data name="ControllerStatusCriticalFanSpeedShortName" xml:space="preserve">
+    <value>Critical Fan RPM</value>
+  </data>
+  <data name="ControllerStatusCriticalFanSpeedFullName" xml:space="preserve">
+    <value>Critically Low Fan Speed</value>
+  </data>
+  <data name="ControllerStatusCriticalFanSpeedTip" xml:space="preserve">
+    <value>Fan speed is critically low</value>
+  </data>
+  <data name="ControllerStatusAlarmPotShortName" xml:space="preserve">
+    <value>POT comm Err</value>
+  </data>
+  <data name="ControllerStatusAlarmPotFullName" xml:space="preserve">
+    <value>DigiPOT(s) Communication Error</value>
+  </data>
+  <data name="ControllerStatusAlarmMaxShortName" xml:space="preserve">
+    <value>MAX comm Err</value>
+  </data>
+  <data name="ControllerStatusAlarmMaxFullName" xml:space="preserve">
+    <value>MAX31790 Communication Error</value>
+  </data>
+  <data name="ControllerStatusAlarmPotTip" xml:space="preserve">
+    <value>Communication error with one or more DigiPOT chips (DS1841)</value>
+  </data>
+  <data name="ControllerStatusAlarmMaxTip" xml:space="preserve">
+    <value>Communication error with the fan controller chip (MAX31790)</value>
+  </data>
+  <data name="ControllerStatusAlarmBadSensorShortName" xml:space="preserve">
+    <value>Sns comm Err</value>
+  </data>
+  <data name="ControllerStatusAlarmBadSensorTip" xml:space="preserve">
+    <value>Hardware or communication error with one or more sensors</value>
+  </data>
+  <data name="ControllerStatusAlarmLowRamShortName" xml:space="preserve">
+    <value>Low RAM</value>
+  </data>
+  <data name="ControllerStatusAlarmLowRamFullName" xml:space="preserve">
+    <value>Insufficient Free RAM</value>
+  </data>
+  <data name="ControllerStatusAlarmLowRamTip" xml:space="preserve">
+    <value>Critically low free RAM</value>
+  </data>
+  <data name="ControllerStatusAlarmPowerShortName" xml:space="preserve">
+    <value>Power Failure</value>
+  </data>
+  <data name="ControllerStatusAlarmPowerFullName" xml:space="preserve">
+    <value>Critically Low Power</value>
+  </data>
+  <data name="ControllerStatusAlarmPowerTip" xml:space="preserve">
+    <value>Problems with the power supply of fans</value>
+  </data>
+  <data name="ControllerStatusAlarmTempShortName" xml:space="preserve">
+    <value>Critical Temp</value>
+  </data>
+  <data name="ControllerStatusAlarmTempFullName" xml:space="preserve">
+    <value>Critically High Temperature</value>
+  </data>
+  <data name="ControllerStatusAlarmTempTip" xml:space="preserve">
+    <value>Critically high temperature on sensors</value>
+  </data>
+  <data name="ControllerStatusAlarmFailureShortName" xml:space="preserve">
+    <value>System Failure</value>
+  </data>
+  <data name="ControllerStatusAlarmFailureFullName" xml:space="preserve">
+    <value>Fatal System Failure</value>
+  </data>
+  <data name="ControllerStatusAlarmFailureTip" xml:space="preserve">
+    <value>Fatal system failure (usually due to configuration saving errors)</value>
+  </data>
+  <data name="ControllerStatusAlarmFanFailedShortName" xml:space="preserve">
+    <value>Fan Failed</value>
+  </data>
+  <data name="ControllerStatusAlarmFanFailedFullName" xml:space="preserve">
+    <value>Fan Failed</value>
+  </data>
+  <data name="ControllerStatusAlarmFanFailedTip" xml:space="preserve">
+    <value>One or more fans failed</value>
+  </data>
+  <data name="ControllerRequestResultTip" xml:space="preserve">
+    <value>Last USB-communication Request result</value>
+  </data>
+  <data name="OperationResultOKValue" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="OperationResultNACKValue" xml:space="preserve">
+    <value>Command not acknowledged</value>
+  </data>
+  <data name="OperationResultBusyValue" xml:space="preserve">
+    <value>System is busy</value>
+  </data>
+  <data name="OperationResultRequestScheduledValue" xml:space="preserve">
+    <value>Request scheduled</value>
+  </data>
+  <data name="OperationResultRequestProcessingValue" xml:space="preserve">
+    <value>Operation in progress</value>
+  </data>
+  <data name="OperationResultRequestDoneValue" xml:space="preserve">
+    <value>Operation done</value>
+  </data>
+  <data name="OperationResultRequestErrorValue" xml:space="preserve">
+    <value>Operation error</value>
+  </data>
+  <data name="OperationResultRequestUnknownResultValue" xml:space="preserve">
+    <value>Operation finished with an unknown result</value>
+  </data>
+  <data name="OperationResultSystemNotConfiguredValue" xml:space="preserve">
+    <value>No system configuration available</value>
+  </data>
+  <data name="OperationResultFanNotFoundValue" xml:space="preserve">
+    <value>Fan not found</value>
+  </data>
+  <data name="OperationResultFanNotConfiguredValue" xml:space="preserve">
+    <value>No fan configuration available</value>
+  </data>
+  <data name="OperationResultSensorNotFoundValue" xml:space="preserve">
+    <value>Sensor not found</value>
+  </data>
+  <data name="OperationResultSensorNotConfiguredValue" xml:space="preserve">
+    <value>No sensor configuration available</value>
+  </data>
+  <data name="OperationResultSensorAlreadyExistsErrorValue" xml:space="preserve">
+    <value>The sensor being added already exists</value>
+  </data>
+  <data name="OperationResultConfigurationUpdateErrorValue" xml:space="preserve">
+    <value>Configuration update error</value>
+  </data>
+  <data name="OperationResultFlashNoPageStartedValue" xml:space="preserve">
+    <value>Configuration page was not erased before writing</value>
+  </data>
+  <data name="ButtonSaveConfigTip" xml:space="preserve">
+    <value>Save the changes to the controller's ROM and apply them</value>
+  </data>
+  <data name="ButtonSaveHostTip" xml:space="preserve">
+    <value>Save the changes</value>
+  </data>
+  <data name="ButtonRebootCaption" xml:space="preserve">
+    <value>Reboot</value>
+  </data>
+  <data name="ButtonRestoreCaption" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="ButtonBackupCaption" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="ButtonRebootTip" xml:space="preserve">
+    <value>Reboot the controller's MCU</value>
+  </data>
+  <data name="ButtonRestoreTip" xml:space="preserve">
+    <value>Restore device configuration from file</value>
+  </data>
+  <data name="ButtonBackupTip" xml:space="preserve">
+    <value>Backup the complete device configuration to a file</value>
+  </data>
+  <data name="SectionAppearanceName" xml:space="preserve">
+    <value>APPEARANCE</value>
+  </data>
+  <data name="SystemDisplayRotationParameterFullName" xml:space="preserve">
+    <value>Display Rotation:</value>
+  </data>
+  <data name="SectionBehaviourName" xml:space="preserve">
+    <value>BEHAVIOR</value>
+  </data>
+  <data name="SectionConfigurationName" xml:space="preserve">
+    <value>CONFIGURATION</value>
+  </data>
+  <data name="SectionSubstitutionMatrixName" xml:space="preserve">
+    <value>SUBSTITUTION MATRIX</value>
+  </data>
+  <data name="SystemDisplayBrightnessParameterFullName" xml:space="preserve">
+    <value>Display Brightness:</value>
+  </data>
+  <data name="SystemBuzzerModeParameterFullName" xml:space="preserve">
+    <value>Buzzer Mode:</value>
+  </data>
+  <data name="SystemBuzzerModeParameterTip" xml:space="preserve">
+    <value>Setting up a list of events for triggering a sound signal</value>
+  </data>
+  <data name="SystemBuzzerWaveformParameterFullName" xml:space="preserve">
+    <value>Buzzer Sound:</value>
+  </data>
+  <data name="SystemBuzzerWaveformParameterTip" xml:space="preserve">
+    <value>Buzzer waveform option</value>
+  </data>
+  <data name="SystemProModeParameterFullName" xml:space="preserve">
+    <value>Professional Mode:</value>
+  </data>
+  <data name="SystemProModeParameterTip" xml:space="preserve">
+    <value>Enables more stringent fan metric requirements and more flexible control options (scanning takes longer)</value>
+  </data>
+  <data name="SystemDetectFanPropertiesParameterFullName" xml:space="preserve">
+    <value>Detect Fan Properties:</value>
+  </data>
+  <data name="SystemDetectFanPropertiesParameterTip" xml:space="preserve">
+    <value>Try to detect the size, power and class of the fan (experimental function, takes time and works unreliably)</value>
+  </data>
+  <data name="SystemLockSubstMatrixParameterFullName" xml:space="preserve">
+    <value>Lock Substitution Matrix:</value>
+  </data>
+  <data name="SystemLockSubstMatrixParameterTip" xml:space="preserve">
+    <value>Do not automatically recalculate fan Substitution Matrix coefficients when scanning fans</value>
+  </data>
+  <data name="SystemHLPBVoltageParameterFullName" xml:space="preserve">
+    <value>Reference Fan PS Voltage:</value>
+  </data>
+  <data name="SystemHLPBVoltageParameterTip" xml:space="preserve">
+    <value>Fan power bus voltage reference value (measured every time the hardware is scanned)</value>
+  </data>
+  <data name="DialogScanFanHardwareHeaderFormat" xml:space="preserve">
+    <value>Scan {0} Hardware</value>
+  </data>
+  <data name="DialogScanFanModelHeaderFormat" xml:space="preserve">
+    <value>Scan {0} Model</value>
+  </data>
+  <data name="DialogScanFanHardwareMessageFormat" xml:space="preserve">
+    <value>This will reset the fan's hardware settings and block other functions for up to {0} minute(s).
+Continue?</value>
+  </data>
+  <data name="DialogScanFanModelMessageFormat" xml:space="preserve">
+    <value>This will reset the fan's current settings and block other functions for up to {0} minute(s).
+Continue?</value>
+  </data>
+  <data name="DialogScanAllFanHardwareHeaderFormat" xml:space="preserve">
+    <value>Scan All Fan Hardware</value>
+  </data>
+  <data name="DialogScanSensorsHeaderFormat" xml:space="preserve">
+    <value>Rescan Sensors</value>
+  </data>
+  <data name="DialogScanAllFanModelHeaderFormat" xml:space="preserve">
+    <value>Scan All Fan Models</value>
+  </data>
+  <data name="DialogScanAllFanHardwareMessageFormat" xml:space="preserve">
+    <value>This will reset the hardware settings of all fans and block other functions for up to {0} minute(s).
+Continue?</value>
+  </data>
+  <data name="DialogScanSensorsMessageFormat" xml:space="preserve">
+    <value>Available temperature sensors will be rescanned. Existing settings for the found sensors will be preserved.
+Continue?</value>
+  </data>
+  <data name="DialogScanAllFanModelMessageFormat" xml:space="preserve">
+    <value>This will reset the settings of all fans and block other functions for up to {0} minute(s).
+Continue?</value>
+  </data>
+  <data name="DialogScanSelectedFanHardwareHeaderFormat" xml:space="preserve">
+    <value>Scan the hardware of {0} fan(s)</value>
+  </data>
+  <data name="DialogScanSelectedFanModelHeaderFormat" xml:space="preserve">
+    <value>Scan the Model of {0} fan(s)</value>
+  </data>
+  <data name="DialogScanSelectedFanHardwareMessageFormat" xml:space="preserve">
+    <value>This will reset the hardware settings of the fans and block other functions for up to {0} minute(s).
+Continue?</value>
+  </data>
+  <data name="DialogScanSelectedFanModelMessageFormat" xml:space="preserve">
+    <value>This will reset the settings of the fans and block other functions for up to {0} minute(s).
+Continue?</value>
+  </data>
+  <data name="DialogRebootControllerHeaderFormat" xml:space="preserve">
+    <value>Reboot Controller</value>
+  </data>
+  <data name="DialogRemoveHostHeaderFormat" xml:space="preserve">
+    <value>Remove Host</value>
+  </data>
+  <data name="DialogFactoryResetControllerHeaderFormat" xml:space="preserve">
+    <value>Factory Reset</value>
+  </data>
+  <data name="DialogRebootControllerMessageFormat" xml:space="preserve">
+    <value>The controller will reboot. This may interrupt scanning processes (if any) and result in the loss of some settings/configuration.
+Continue?</value>
+  </data>
+  <data name="DialogRemoveHostMessageFormat" xml:space="preserve">
+    <value>Host {0} will be removed from the list.
+Continue?</value>
+  </data>
+  <data name="DialogFactoryResetControllerMessageFormat" xml:space="preserve">
+    <value>The controller's configuration pages will be completely cleared. All settings will be restored to factory defaults. The controller will reboot.
+Continue?</value>
+  </data>
+  <data name="OverlayHardwareScanningCaption" xml:space="preserve">
+    <value>Hardware Scanning...</value>
+  </data>
+  <data name="OverlayFanScanningCaption" xml:space="preserve">
+    <value>Fan Scanning...</value>
+  </data>
+  <data name="OverlaySensorScanningCaption" xml:space="preserve">
+    <value>Sensor Scanning...</value>
+  </data>
+  <data name="OverlayInitializationCaption" xml:space="preserve">
+    <value>Initialization...</value>
+  </data>
+  <data name="OverlayBusyCaption" xml:space="preserve">
+    <value>Busy...</value>
+  </data>
+  <data name="SystemDisplaySupportParameterFullName" xml:space="preserve">
+    <value>IPS Display Support</value>
+  </data>
+  <data name="SystemLoggerSupportParameterFullName" xml:space="preserve">
+    <value>UART Logger Support</value>
+  </data>
+  <data name="SystemDisplaySupportParameterTip" xml:space="preserve">
+    <value>The controller firmware supports IPS Display</value>
+  </data>
+  <data name="SystemLoggerSupportParameterTip" xml:space="preserve">
+    <value>The controller firmware supports UART Logger (115200 8N1)</value>
+  </data>
+  <data name="SystemFirmwareVersionParameterFullName" xml:space="preserve">
+    <value>Firmware Version:</value>
+  </data>
+  <data name="SystemFirmwareVersionParameterTip" xml:space="preserve">
+    <value>Current controller firmware version</value>
+  </data>
+  <data name="SectionOtherParametersName" xml:space="preserve">
+    <value>OTHER</value>
+  </data>
+  <data name="ButtonCustomizeCaption" xml:space="preserve">
+    <value>Customize</value>
+  </data>
+  <data name="ButtonCustomizeTip" xml:space="preserve">
+    <value>Select the events for which you want to receive a signal from the buzzer</value>
+  </data>
+  <data name="ButtonFactoryResetCaption" xml:space="preserve">
+    <value>Factory Reset</value>
+  </data>
+  <data name="ButtonFactoryResetTip" xml:space="preserve">
+    <value>Clear all controller settings and return to default ones</value>
+  </data>
+  <data name="DisplayRotationRotate0Value" xml:space="preserve">
+    <value>0°</value>
+  </data>
+  <data name="DisplayRotationRotate180Value" xml:space="preserve">
+    <value>180°</value>
+  </data>
+  <data name="DisplayRotationRotate90Value" xml:space="preserve">
+    <value>90°</value>
+  </data>
+  <data name="DisplayRotationRotate270Value" xml:space="preserve">
+    <value>270°</value>
+  </data>
+  <data name="BuzzerWaveformCricketValue" xml:space="preserve">
+    <value>Cricket</value>
+  </data>
+  <data name="BuzzerWaveformLoudValue" xml:space="preserve">
+    <value>Loud</value>
+  </data>
+  <data name="BuzzerOptionsWindowTitle" xml:space="preserve">
+    <value>Buzzer Alarm Options</value>
+  </data>
+  <data name="BuzzerOptionsHeaderCaption" xml:space="preserve">
+    <value>Event list</value>
+  </data>
+  <data name="BuzzerOptionsHeaderTip" xml:space="preserve">
+    <value>Select the events that should trigger the buzzer</value>
+  </data>
+  <data name="AlarmProfileMuteValue" xml:space="preserve">
+    <value>Mute</value>
+  </data>
+  <data name="AlarmProfileAlarmsOnlyValue" xml:space="preserve">
+    <value>Alarms Only</value>
+  </data>
+  <data name="AlarmProfileNoisyValue" xml:space="preserve">
+    <value>Noisy</value>
+  </data>
+  <data name="AlarmProfileCustomValue" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="SectionAlarmsName" xml:space="preserve">
+    <value>ALARMS</value>
+  </data>
+  <data name="SectionWarningsName" xml:space="preserve">
+    <value>WARNINGS</value>
+  </data>
+  <data name="ControllerStatusAlarmBadSensorFullName" xml:space="preserve">
+    <value>Sensor Communication Error</value>
+  </data>
+  <data name="ControllerRequestResultFullName" xml:space="preserve">
+    <value>Last request result:</value>
+  </data>
+  <data name="OkCaption" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="AlarmCaption" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="WarningCaption" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient0Value" xml:space="preserve">
+    <value>0 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient10Value" xml:space="preserve">
+    <value>10 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient20Value" xml:space="preserve">
+    <value>20 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient30Value" xml:space="preserve">
+    <value>30 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient150Value" xml:space="preserve">
+    <value>150 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient140Value" xml:space="preserve">
+    <value>140 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient130Value" xml:space="preserve">
+    <value>130 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient120Value" xml:space="preserve">
+    <value>120 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient110Value" xml:space="preserve">
+    <value>110 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient100Value" xml:space="preserve">
+    <value>100 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient90Value" xml:space="preserve">
+    <value>90 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient80Value" xml:space="preserve">
+    <value>80 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient70Value" xml:space="preserve">
+    <value>70 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient60Value" xml:space="preserve">
+    <value>60 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient50Value" xml:space="preserve">
+    <value>50 %</value>
+  </data>
+  <data name="SubstitutionCoefficientCoefficient40Value" xml:space="preserve">
+    <value>40 %</value>
+  </data>
+  <data name="SubstitutionMatrixChangedCaption" xml:space="preserve">
+    <value>Save the config to apply coefficients</value>
+  </data>
+  <data name="ButtonAddSensorCaption" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ButtonAddHostCaption" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ButtonRemoveHostCaption" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ButtonEditHostCaption" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ButtonAddSensorTip" xml:space="preserve">
+    <value>Add software sensor (programmatically transmitted from the host)</value>
+  </data>
+  <data name="ButtonRemoveSensorCaption" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ButtonRemoveSensorTip" xml:space="preserve">
+    <value>Delete sensor from the list</value>
+  </data>
+  <data name="ButtonRescanSensorsCaption" xml:space="preserve">
+    <value>Rescan Sensors</value>
+  </data>
+  <data name="ButtonRescanSensorsTip" xml:space="preserve">
+    <value>Rescan sensors connected to the controller</value>
+  </data>
+  <data name="ColumnHeaderSensorTypeCaption" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="TSensorTypeDS1841Tip" xml:space="preserve">
+    <value>DigiPOT DS1841 internal sensor</value>
+  </data>
+  <data name="TSensorTypeDS1841Value" xml:space="preserve">
+    <value>DS1841 (DigiPOT)</value>
+  </data>
+  <data name="TSensorTypeDS18B20Tip" xml:space="preserve">
+    <value>DS18B20 temperature sensor</value>
+  </data>
+  <data name="TSensorTypeDS18B20Value" xml:space="preserve">
+    <value>DS18B20</value>
+  </data>
+  <data name="TSensorTypeUnknownTip" xml:space="preserve">
+    <value>Unknown temperature sensor</value>
+  </data>
+  <data name="TSensorTypeUnknownValue" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="TSensorTypeOtherTip" xml:space="preserve">
+    <value>Other sensor type</value>
+  </data>
+  <data name="TSensorTypeMCUTip" xml:space="preserve">
+    <value>MCU internal sensor</value>
+  </data>
+  <data name="TSensorTypeMCUValue" xml:space="preserve">
+    <value>MCU</value>
+  </data>
+  <data name="TSensorTypeSWValue" xml:space="preserve">
+    <value>Software (host)</value>
+  </data>
+  <data name="ColumnHeaderSensorOutputControlCaption" xml:space="preserve">
+    <value>Fan Control Output</value>
+  </data>
+  <data name="ColumnHeaderSensorOutputControlTip" xml:space="preserve">
+    <value>Control levels produced by the sensor for each of the fans</value>
+  </data>
+  <data name="SensorStatusTemperatureWarningShortName" xml:space="preserve">
+    <value>Temp Warning</value>
+  </data>
+  <data name="SensorStatusTemperatureWarningTip" xml:space="preserve">
+    <value>High temperature on sensor</value>
+  </data>
+  <data name="SensorStatusTemperatureAlarmShortName" xml:space="preserve">
+    <value>Temp Alarm</value>
+  </data>
+  <data name="SensorStatusTemperatureAlarmTip" xml:space="preserve">
+    <value>Critically high temperature on sensor</value>
+  </data>
+  <data name="SensorStatusHardwareErrorShortName" xml:space="preserve">
+    <value>Hardware Error</value>
+  </data>
+  <data name="SensorStatusHardwareErrorTip" xml:space="preserve">
+    <value>Sensor hardware or communication error</value>
+  </data>
+  <data name="SensorStatusValidShortName" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="SensorStatusValidTip" xml:space="preserve">
+    <value>The sensor readings are valid</value>
+  </data>
+  <data name="SensorStatusNotConfiguredShortName" xml:space="preserve">
+    <value>Not configured</value>
+  </data>
+  <data name="SensorStatusNotConfiguredTip" xml:space="preserve">
+    <value>Failed to apply sensor hardware configuration</value>
+  </data>
+  <data name="SensorStatusDisconnectedShortName" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="SensorStatusDisconnectedTip" xml:space="preserve">
+    <value>Sensor disconnected</value>
+  </data>
+  <data name="SensorSerialNumberParameterShortFormat" xml:space="preserve">
+    <value>SN: {0}</value>
+  </data>
+  <data name="SensorSerialNumberParameterTip" xml:space="preserve">
+    <value>Serial number</value>
+  </data>
+  <data name="SensorWarningTempParameterShortFormat" xml:space="preserve">
+    <value>Warning Temp: {0} °</value>
+  </data>
+  <data name="SensorWarningTempParameterFullName" xml:space="preserve">
+    <value>Warning Temperature</value>
+  </data>
+  <data name="SensorAlarmTempParameterShortFormat" xml:space="preserve">
+    <value>Alarm Temp: {0} °</value>
+  </data>
+  <data name="SensorAlarmTempParameterFullName" xml:space="preserve">
+    <value>Alarm Temperature</value>
+  </data>
+  <data name="SensorWarningTempParameterTip" xml:space="preserve">
+    <value>Temperature threshold for triggering a warning</value>
+  </data>
+  <data name="SensorAlarmTempParameterTip" xml:space="preserve">
+    <value>Temperature threshold for triggering an alarm</value>
+  </data>
+  <data name="SensorIsVisibleParameterShortName" xml:space="preserve">
+    <value>Visible</value>
+  </data>
+  <data name="SensorIsVisibleParameterTip" xml:space="preserve">
+    <value>Show the sensor on the controller display</value>
+  </data>
+  <data name="SensorIsIgnorableParameterTip" xml:space="preserve">
+    <value>Whether the sensor will be ignored (alarm and fan impact are disabled) if it is unavailable</value>
+  </data>
+  <data name="SensorIsPermanentParameterShortName" xml:space="preserve">
+    <value>Persistent</value>
+  </data>
+  <data name="SensorIsIgnorableParameterShortName" xml:space="preserve">
+    <value>Ignorable</value>
+  </data>
+  <data name="SensorIsPermanentParameterFullName" xml:space="preserve">
+    <value>Is Persistent</value>
+  </data>
+  <data name="SensorIsPermanentParameterTip" xml:space="preserve">
+    <value>Sensor configuration saved to the controller ROM</value>
+  </data>
+  <data name="SensorIsDeletableParameterShortName" xml:space="preserve">
+    <value>Deletable</value>
+  </data>
+  <data name="SensorIsDeletableParameterFullName" xml:space="preserve">
+    <value>Is Deletable</value>
+  </data>
+  <data name="SensorIsDeletableParameterTip" xml:space="preserve">
+    <value>The sensor can be removed (not available for controller hardware sensors)</value>
+  </data>
+  <data name="SensorLowThresholdsParameterShortName" xml:space="preserve">
+    <value>Low Thresholds:</value>
+  </data>
+  <data name="SensorFanImpactParameterShortName" xml:space="preserve">
+    <value>Fan Impact:</value>
+  </data>
+  <data name="SensorFanImpactParameterTip" xml:space="preserve">
+    <value>The level of sensor impact on each fan (highlighted caption indicates that the Turbo Mode is activated if the sensor is unavailable)</value>
+  </data>
+  <data name="SensorHighThresholdsParameterShortName" xml:space="preserve">
+    <value>High Thresholds:</value>
+  </data>
+  <data name="SensorLowThresholdsParameterTip" xml:space="preserve">
+    <value>Low temperature thresholds for fans</value>
+  </data>
+  <data name="SensorHighThresholdsParameterTip" xml:space="preserve">
+    <value>High temperature thresholds for fans</value>
+  </data>
+  <data name="SensorTypeParameterFullName" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="SensorTypeParameterTip" xml:space="preserve">
+    <value>Sensor type (internal, connected, software, etc.)</value>
+  </data>
+  <data name="TSensorTypeOtherValue" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="TSensorTypeSWTip" xml:space="preserve">
+    <value>Virtual sensor transmitted from the host</value>
+  </data>
+  <data name="SensorHardwareConfigParameterFullName" xml:space="preserve">
+    <value>Hardware Config Word</value>
+  </data>
+  <data name="SensorSoftwareConfigParameterFullName" xml:space="preserve">
+    <value>Initial Delay (s)</value>
+  </data>
+  <data name="SensorSoftwareConfigParameterTip" xml:space="preserve">
+    <value>After boot, the Controller will not poll this Sensor for a specified time (in seconds) to allow the control software to initialize and transmit the first readings.</value>
+  </data>
+  <data name="SensorHardwareConfigParameterTip" xml:space="preserve">
+    <value>Sensor hardware configuration parameter (for internal use only)</value>
+  </data>
+  <data name="SensorHardwareConfigParameterFormat" xml:space="preserve">
+    <value>{0:X4}</value>
+  </data>
+  <data name="SensorIsActiveParameterFullName" xml:space="preserve">
+    <value>Is Active</value>
+  </data>
+  <data name="SensorIsActiveParameterTip" xml:space="preserve">
+    <value>Take the sensor readings into account when calculating fan power</value>
+  </data>
+  <data name="SectionFanImpactName" xml:space="preserve">
+    <value>FAN IMPACT</value>
+  </data>
+  <data name="SensorIsVisibleParameterFullName" xml:space="preserve">
+    <value>Is Visible</value>
+  </data>
+  <data name="SensorIsIgnorableParameterFullName" xml:space="preserve">
+    <value>Is Ignorable</value>
+  </data>
+  <data name="ValidationLowTemperatureThresholdFormat" xml:space="preserve">
+    <value>Low must be ≤ High</value>
+  </data>
+  <data name="ValidationHighTemperatureThresholdFormat" xml:space="preserve">
+    <value>High must be ≥ Low</value>
+  </data>
+  <data name="ValidationAlarmTemperatureThresholdFormat" xml:space="preserve">
+    <value>Alarm must be ≥ Warning</value>
+  </data>
+  <data name="ValidationWarningTemperatureThresholdFormat" xml:space="preserve">
+    <value>Warning must be ≤ Alarm</value>
+  </data>
+  <data name="ButtonCloneSelectedCaption" xml:space="preserve">
+    <value>Clone Selected</value>
+  </data>
+  <data name="DialogCloneItemConfigHeaderFormat" xml:space="preserve">
+    <value>Clone Configuration</value>
+  </data>
+  <data name="DialogCloneItemConfigMessageFormat" xml:space="preserve">
+    <value>Clone selected fan impact settings to all others?</value>
+  </data>
+  <data name="ButtonCloneCaption" xml:space="preserve">
+    <value>Clone</value>
+  </data>
+  <data name="ColumnHeaderFanLowThresholdCaption" xml:space="preserve">
+    <value>Low Threshold</value>
+  </data>
+  <data name="ColumnHeaderFanHighThresholdCaption" xml:space="preserve">
+    <value>High Threshold</value>
+  </data>
+  <data name="ColumnHeaderFanLowThresholdTip" xml:space="preserve">
+    <value>Low temperature threshold for the fan (zero fan impact)</value>
+  </data>
+  <data name="ColumnHeaderFanHighThresholdTip" xml:space="preserve">
+    <value>High temperature threshold for the fan (maximum fan impact)</value>
+  </data>
+  <data name="ColumnHeaderFanImpactCaption" xml:space="preserve">
+    <value>Normal Impact</value>
+  </data>
+  <data name="ColumnHeaderFanImpactTip" xml:space="preserve">
+    <value>The maximum possible fan speed when the upper temperature threshold is reached</value>
+  </data>
+  <data name="MenuRemoveSensorCaption" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ConfigurationSaveWindow" xml:space="preserve">
+    <value>Save Controller Configuration</value>
+  </data>
+  <data name="ConfigurationLoadWindow" xml:space="preserve">
+    <value>Load Controller Configuration</value>
+  </data>
+  <data name="ConfigurationJsonFileFormatShortName" xml:space="preserve">
+    <value>JSON Config</value>
+  </data>
+  <data name="ConfigurationAllFileFormatsShortName" xml:space="preserve">
+    <value>All Files</value>
+  </data>
+  <data name="DialogErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ButtonOkCaption" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="DialogEmptyConfigurationMessageFormat" xml:space="preserve">
+    <value>Please wait until the complete configuration is transferred by the device and try again.</value>
+  </data>
+  <data name="DialogCommandErrorMessageFormat" xml:space="preserve">
+    <value>The command was not accepted by the service or was rejected by the device.</value>
+  </data>
+  <data name="DialogExceptionThrownHeaderFormat" xml:space="preserve">
+    <value>An exception was thrown during operation</value>
+  </data>
+  <data name="DialogBadConfigurationFileHeaderFormat" xml:space="preserve">
+    <value>Failed to read/parse the configuration file</value>
+  </data>
+  <data name="DialogHostListAddFailedHeaderFormat" xml:space="preserve">
+    <value>Failed to Add new Host</value>
+  </data>
+  <data name="DialogHostListEditFailedHeaderFormat" xml:space="preserve">
+    <value>Failed to Edit the Host</value>
+  </data>
+  <data name="DialogHostListRemoveFailedHeaderFormat" xml:space="preserve">
+    <value>Failed to Remove the Host</value>
+  </data>
+  <data name="DialogHostListNameAlreadyExistMessageFormat" xml:space="preserve">
+    <value>A Host named {0} is already in the list.</value>
+  </data>
+  <data name="DialogErrorWritingConfigurationFileHeaderFormat" xml:space="preserve">
+    <value>Failed to write the configuration file</value>
+  </data>
+  <data name="DialogBadConfigurationFileMessageFormat" xml:space="preserve">
+    <value>The configuration file is empty or corrupted.</value>
+  </data>
+  <data name="DialogDeleteSensorHeaderFormat" xml:space="preserve">
+    <value>Delete {0} Sensor</value>
+  </data>
+  <data name="DialogDeleteSensorMessageFormat" xml:space="preserve">
+    <value>Are you sure you want to remove the sensor from the controller?</value>
+  </data>
+  <data name="DialogDeleteSensorsHeaderFormat" xml:space="preserve">
+    <value>Delete Selected Sensors</value>
+  </data>
+  <data name="DialogRemoveHostsHeaderFormat" xml:space="preserve">
+    <value>Remove Selected Hosts</value>
+  </data>
+  <data name="DialogDeleteSensorsMessageFormat" xml:space="preserve">
+    <value>Are you sure you want to remove selected sensor(s) from the controller?</value>
+  </data>
+  <data name="DialogRemoveHostsMessageFormat" xml:space="preserve">
+    <value>Are you sure you want to remove selected host(s) from the list?</value>
+  </data>
+  <data name="SensorStatusStatusErrorValue" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="SensorStatusStatusAlarmValue" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="SectionSensorStatusName" xml:space="preserve">
+    <value>Sensor Status</value>
+  </data>
+  <data name="SectionFanStatusName" xml:space="preserve">
+    <value>Fan Status</value>
+  </data>
+  <data name="SectionSensorPropertiesName" xml:space="preserve">
+    <value>Sensor Properties</value>
+  </data>
+  <data name="SectionFanPropertiesName" xml:space="preserve">
+    <value>Fan Properties</value>
+  </data>
+  <data name="SectionControllerMetricsName" xml:space="preserve">
+    <value>Metrics</value>
+  </data>
+  <data name="HostHardwareTypeCPUValue" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="HostHardwareTypeCPUTip" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="HostHardwareTypeUnknownValue" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="HostHardwareTypeUnknownTip" xml:space="preserve">
+    <value>Unknown device</value>
+  </data>
+  <data name="HostHardwareTypeSensorValue" xml:space="preserve">
+    <value>Sensor</value>
+  </data>
+  <data name="HostHardwareTypeSensorTip" xml:space="preserve">
+    <value>Temperature sensor</value>
+  </data>
+  <data name="HostHardwareTypeCoolerValue" xml:space="preserve">
+    <value>Cooler</value>
+  </data>
+  <data name="HostHardwareTypeCoolerTip" xml:space="preserve">
+    <value>Cooler</value>
+  </data>
+  <data name="HostHardwareTypeBatteryValue" xml:space="preserve">
+    <value>Battery</value>
+  </data>
+  <data name="HostHardwareTypeBatteryTip" xml:space="preserve">
+    <value>Battery</value>
+  </data>
+  <data name="HostHardwareTypePSUValue" xml:space="preserve">
+    <value>Power supply or Power monitor</value>
+  </data>
+  <data name="HostHardwareTypePSUTip" xml:space="preserve">
+    <value>Power supply or Power monitor</value>
+  </data>
+  <data name="HostHardwareTypeNetworkValue" xml:space="preserve">
+    <value>Network adapter</value>
+  </data>
+  <data name="HostHardwareTypeNetworkTip" xml:space="preserve">
+    <value>Network adapter</value>
+  </data>
+  <data name="HostHardwareTypeControllerValue" xml:space="preserve">
+    <value>Controller</value>
+  </data>
+  <data name="HostHardwareTypeControllerTip" xml:space="preserve">
+    <value>Super I/O chip or Embedded Controller</value>
+  </data>
+  <data name="HostHardwareTypeHDDValue" xml:space="preserve">
+    <value>Storage</value>
+  </data>
+  <data name="HostHardwareTypeHDDTip" xml:space="preserve">
+    <value>Storage</value>
+  </data>
+  <data name="HostHardwareTypeGPUValue" xml:space="preserve">
+    <value>GPU</value>
+  </data>
+  <data name="HostHardwareTypeGPUTip" xml:space="preserve">
+    <value>Graphics card (GPU)</value>
+  </data>
+  <data name="HostHardwareTypeMemoryValue" xml:space="preserve">
+    <value>Memory</value>
+  </data>
+  <data name="HostHardwareTypeMemoryTip" xml:space="preserve">
+    <value>Memory</value>
+  </data>
+  <data name="HostHardwareTypeMotherboardValue" xml:space="preserve">
+    <value>Motherboard</value>
+  </data>
+  <data name="HostHardwareTypeMotherboardTip" xml:space="preserve">
+    <value>Motherboard</value>
+  </data>
+  <data name="SelectNodeCaption" xml:space="preserve">
+    <value>Select a node to see details</value>
+  </data>
+  <data name="HostDeviceDetailsHeaderCaption" xml:space="preserve">
+    <value>Device Details</value>
+  </data>
+  <data name="HostSensorDetailsHeaderCaption" xml:space="preserve">
+    <value>Sensor Details</value>
+  </data>
+  <data name="HostDeviceTypeParameterFullName" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="HostDeviceTypeParameterTip" xml:space="preserve">
+    <value>Host Device type</value>
+  </data>
+  <data name="HostDeviceInfoParameterFullName" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="HostDeviceInfoParameterTip" xml:space="preserve">
+    <value>Additional Device information</value>
+  </data>
+  <data name="HostDeviceChildrenParameterFullName" xml:space="preserve">
+    <value>Children</value>
+  </data>
+  <data name="HostDeviceChildrenParameterTip" xml:space="preserve">
+    <value>Device children count</value>
+  </data>
+  <data name="HostSensorTemperatureParameterFullName" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="HostSensorInfoParameterFullName" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="HostSensorIDParameterFullName" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="HostSensorPathParameterFullName" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="HostSensorCritTemperatureParameterFullName" xml:space="preserve">
+    <value>Critical Temperature</value>
+  </data>
+  <data name="HostSensorMaxTemperatureParameterFullName" xml:space="preserve">
+    <value>Max Temperature</value>
+  </data>
+  <data name="HostSensorTemperatureParameterTip" xml:space="preserve">
+    <value>Current Sensor temperature</value>
+  </data>
+  <data name="HostSensorInfoParameterTip" xml:space="preserve">
+    <value>Additional Sensor information</value>
+  </data>
+  <data name="HostSensorIDParameterTip" xml:space="preserve">
+    <value>Unique Sensor identifier</value>
+  </data>
+  <data name="HostSensorPathParameterTip" xml:space="preserve">
+    <value>Logical path to the Sensor object</value>
+  </data>
+  <data name="HostSensorIsValidParameterTip" xml:space="preserve">
+    <value>The host Sensor readings are valid</value>
+  </data>
+  <data name="HostSensorCritTemperatureParameterTip" xml:space="preserve">
+    <value>Critical Sensor temperature</value>
+  </data>
+  <data name="HostSensorMaxTemperatureParameterTip" xml:space="preserve">
+    <value>Maximum allowable Sensor temperature</value>
+  </data>
+  <data name="HostSensorIsValidParameterFullName" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="DialogNoHostSensorHeaderFormat" xml:space="preserve">
+    <value>No Sensor</value>
+  </data>
+  <data name="DialogWrongHostSensorHeaderFormat" xml:space="preserve">
+    <value>Wrong Sensor</value>
+  </data>
+  <data name="DialogWrongHostSensorMessageFormat" xml:space="preserve">
+    <value>Unable to proceed: an incorrect sensor has been selected or it has already been added to the Controller.</value>
+  </data>
+  <data name="DialogNoHostSensorMessageFormat" xml:space="preserve">
+    <value>There are no temperature sensors found on the host that can be added for monitoring in the controller.</value>
+  </data>
+  <data name="ButtonConfigureHostsTip" xml:space="preserve">
+    <value>Configure the list of available Hosts</value>
+  </data>
+  <data name="HostListWindowTitle" xml:space="preserve">
+    <value>Hosts</value>
+  </data>
+  <data name="HostStatusStatusOfflineValue" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="HostStatusStatusOnlineValue" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="ColumnHeaderHostStatusTip" xml:space="preserve">
+    <value>Complex host status</value>
+  </data>
+  <data name="ColumnHeaderHostStatusCaption" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="MenuRemoveHostCaption" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="MenuEditHostCaption" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ColumnHeaderHostDeviceCountCaption" xml:space="preserve">
+    <value>Devices</value>
+  </data>
+  <data name="ColumnHeaderHostDeviceCountTip" xml:space="preserve">
+    <value>Number of Fan Controllers connected to the Host</value>
+  </data>
+  <data name="HostAddWindowTitle" xml:space="preserve">
+    <value>Add Host</value>
+  </data>
+  <data name="HostEditWindowTitle" xml:space="preserve">
+    <value>Edit Host Details</value>
+  </data>
+  <data name="ValidationFieldCannotBeEmptyFormat" xml:space="preserve">
+    <value>Field cannot be Empty</value>
+  </data>
+  <data name="ValidationEndpointAlreadyExistsFormat" xml:space="preserve">
+    <value>Endpoint Already Exists</value>
+  </data>
+  <data name="DialogHostListEndpointAlreadyExistMessageFormat" xml:space="preserve">
+    <value>The endpoint with address {0} and port {1} is already in the list.</value>
+  </data>
+  <data name="DialogHostListItemNotFoundMessageFormat" xml:space="preserve">
+    <value>The edited Host was not found in the list.</value>
+  </data>
+  <data name="DialogHostListUnknownErrorMessageFormat" xml:space="preserve">
+    <value>Unknown error while editing host list.</value>
+  </data>
+  <data name="ButtonReconnectHostCaption" xml:space="preserve">
+    <value>Reconnect</value>
+  </data>
+  <data name="MenuReconnectHostCaption" xml:space="preserve">
+    <value>Reconnect</value>
+  </data>
+  <data name="ButtonReconnectHostTip" xml:space="preserve">
+    <value>Reset connection to selected Hosts and reconnect</value>
+  </data>
+  <data name="ColumnHeaderUnavailableSensorFanImpactCaption" xml:space="preserve">
+    <value>Failure Impact</value>
+  </data>
+  <data name="ColumnHeaderUnavailableSensorFanImpactTip" xml:space="preserve">
+    <value>Fan speed if this sensor is not available</value>
+  </data>
+  <data name="DialogEmptyConfigurationHeaderFormat" xml:space="preserve">
+    <value>No Configuration Available</value>
+  </data>
+  <data name="DialogCommandErrorHeaderFormat" xml:space="preserve">
+    <value>Command Failed</value>
+  </data>
+  <data name="SectionSpeedMetricsName" xml:space="preserve">
+    <value>SPEED METRICS</value>
+  </data>
+  <data name="SectionFanOptionsName" xml:space="preserve">
+    <value>FAN OPTIONS</value>
+  </data>
+  <data name="SectionControlSettingsName" xml:space="preserve">
+    <value>CONTROL SETTINGS</value>
+  </data>
+  <data name="ValidationInvalidHostAddressFormat" xml:space="preserve">
+    <value>Invalid host name or IP address</value>
+  </data>
+  <data name="DialogSettingsSaveFailedHeaderFormat" xml:space="preserve">
+    <value>Settings not saved</value>
+  </data>
+  <data name="DialogHostListSettingsSaveFailedMessageFormat" xml:space="preserve">
+    <value>The change has been applied, but the settings file could not be saved. It will be lost when the application is restarted.</value>
+  </data>
+  <data name="DialogHostListReconnectFailedHeaderFormat" xml:space="preserve">
+    <value>Reconnection failed</value>
+  </data>
+  <data name="HostStatusStatusIncompatibleValue" xml:space="preserve">
+    <value>Incompatible</value>
+  </data>
+  <data name="ColumnHeaderHostServiceVersionCaption" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="ColumnHeaderHostServiceVersionTip" xml:space="preserve">
+    <value>Version of the Fan Controller service running on the Host</value>
+  </data>
+  <data name="ButtonContinueCaption" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="DialogConfirmTitle" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="BuzzerOptionsStateTip" xml:space="preserve">
+    <value>Current state of this alarm or warning on the device</value>
+  </data>
+  <data name="ButtonAddHostTip" xml:space="preserve">
+    <value>Add new Host</value>
+  </data>
+  <data name="ButtonRemoveHostTip" xml:space="preserve">
+    <value>Remove selected Host(s)</value>
+  </data>
+  <data name="OperationResultFlashPageAlreadyStartedValue" xml:space="preserve">
+    <value>Configuration page already started</value>
+  </data>
+  <data name="SubstitutionCoefficientUnavailableValue" xml:space="preserve">
+    <value>-</value>
+  </data>
+</root>

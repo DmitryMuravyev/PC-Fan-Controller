@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Theme variants: a resource is looked up in the current theme (Light / Dark)
+        first, then in Default. Shared values are defined in Default; a theme
+        dictionary contains only the values that differ for that theme.
+    -->
+    <ResourceDictionary.ThemeDictionaries>
+
+        <!-- Default (shared by all themes; also the Light theme values) -->
+        <ResourceDictionary x:Key="Default">
+            <!-- Local Statuses -->
+            <SolidColorBrush x:Key="StatusNormal"               Opacity="1.0"   Color="LimeGreen" />
+            <SolidColorBrush x:Key="StatusWarning"              Opacity="1.0"   Color="Orange" />
+            <SolidColorBrush x:Key="StatusError"                Opacity="1.0"   Color="Red" />
+            <SolidColorBrush x:Key="StatusSuspended"            Opacity="1.0"   Color="DarkSlateGray" />
+            <SolidColorBrush x:Key="StatusBusy"                 Opacity="1.0"   Color="DarkMagenta" />
+            <SolidColorBrush x:Key="StatusAction"               Opacity="1.0"   Color="Magenta" />
+            <SolidColorBrush x:Key="StatusOvercool"             Opacity="1.0"   Color="DeepSkyBlue" />
+            <SolidColorBrush x:Key="StatusUnavailable"          Opacity="1.0"   Color="Gray" />
+
+            <!-- Overall States -->
+            <SolidColorBrush x:Key="OverallStateNormal"         Opacity="0.5"   Color="LimeGreen" />
+            <SolidColorBrush x:Key="OverallStateWarning"        Opacity="0.5"   Color="Orange" />
+            <SolidColorBrush x:Key="OverallStateError"          Opacity="0.5"   Color="Red" />
+            <SolidColorBrush x:Key="OverallStateSuspended"      Opacity="0.5"   Color="DarkSlateGray" />
+            <SolidColorBrush x:Key="OverallStateBusy"           Opacity="0.5"   Color="DarkMagenta" />
+            <SolidColorBrush x:Key="OverallStateAction"         Opacity="0.5"   Color="Magenta" />
+            <SolidColorBrush x:Key="OverallStateOvercool"       Opacity="0.5"   Color="DeepSkyBlue" />
+            <SolidColorBrush x:Key="OverallStateUnavailable"    Opacity="0.5"   Color="Gray" />
+
+            <!-- Other -->
+            <SolidColorBrush x:Key="GlobalInfo"                 Opacity="1.0"   Color="DeepSkyBlue" />
+        </ResourceDictionary>
+
+        <!-- Dark theme: lighter variants of the colors with low contrast on a dark background -->
+        <ResourceDictionary x:Key="Dark">
+        </ResourceDictionary>
+
+        <!-- Light theme -->
+        <ResourceDictionary x:Key="Light">
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+
+    <!-- Icons (theme-independent; colored with theme resources) -->
+    <Viewbox x:Key="SettingsIcon" x:Shared="False" Stretch="Uniform">
+        <Canvas Width="24" Height="24" Canvas.Left="0" Canvas.Top="0">
+            <Path Data="M19.43,12.98c0.04,-0.32,0.07,-0.64,0.07,-0.98s-0.03,-0.66,-0.07,-0.98l2.11,-1.65c0.19,-0.15,0.24,-0.42,0.12,-0.64l-2,-3.46c-0.12,-0.22,-0.39,-0.3,-0.61,-0.22l-2.49,1c-0.52,-0.4,-1.08,-0.73,-1.69,-0.98l-0.38,-2.65C14.46,2.18,14.25,2,14,2h-4c-0.25,0,-0.46,0.18,-0.49,0.42l-0.38,2.65c-0.61,0.25,-1.17,0.59,-1.69,0.98l-2.49,-1c-0.23,-0.09,-0.49,0,-0.61,0.22l-2,3.46c-0.13,0.22,-0.07,0.49,0.12,0.64l2.11,1.65c-0.04,0.32,-0.07,0.65,-0.07,0.98s0.03,0.66,0.07,0.98l-2.11,1.65c-0.19,0.15,-0.24,0.42,-0.12,0.64l2,3.46c0.12,0.22,0.39,0.3,0.61,0.22l2.49,-1c0.52,0.4,1.08,0.73,1.69,0.98l0.38,2.65c0.03,0.24,0.24,0.42,0.49,0.42h4c0.25,0,0.46,-0.18,0.49,-0.42l0.38,-2.65c0.61,-0.25,1.17,-0.59,1.69,-0.98l2.49,1c0.23,0.09,0.49,0,0.61,-0.22l2,-3.46c0.12,-0.22,0.07,-0.49,-0.12,-0.64l-2.11,-1.65zM12,15.5c-1.93,0,-3.5,-1.57,-3.5,-3.5s1.57,-3.5,3.5,-3.5,3.5,1.57,3.5,3.5,-1.57,3.5,-3.5,3.5z"
+                  Fill="{DynamicResource SystemBaseMediumColor}"/>
+        </Canvas>
+    </Viewbox>
+
+</ResourceDictionary>

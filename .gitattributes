@@ -1,0 +1,29 @@
+# Normalize text files in the repository (LF), native line endings in working copies
+* text=auto
+
+# Shell scripts must keep LF on every platform (CRLF breaks them on Linux)
+*.sh text eol=lf
+
+# Windows scripts and Visual Studio files
+*.ps1 text eol=crlf
+*.sln text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# STM32CubeMX / firmware files
+*.ioc text
+*.hex text
+
+# Binary files
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.exe binary
+*.dll binary
+*.zip binary
+*.gz binary
+*.bin binary
+*.elf binary

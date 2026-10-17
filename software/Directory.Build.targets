@@ -1,0 +1,6 @@
+<Project>
+
+  <!-- Linux publish: .tar.gz package with Unix permissions (see Build\LinuxPackage.targets) -->
+  <Import Project="Build\LinuxPackage.targets" />
+
+</Project>

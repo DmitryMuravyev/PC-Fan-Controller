@@ -1,0 +1,154 @@
+﻿<Project>
+
+  <!--
+    Linux package: after a Linux publish, the publish folder is also packed into
+    <AssemblyName>-<Version>-<RuntimeIdentifier>.tar.gz next to it. The archive stores
+    Unix permissions (0755 for the application binary, createdump, scripts and .so libraries,
+    0644 for the rest), which a publish on Windows can't set on the files themselves.
+    Extract on Linux with:  tar -xzf <file>.tar.gz
+  -->
+
+  <UsingTask TaskName="CreateTarGz"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <SourceDirectory ParameterType="System.String" Required="true" />
+      <OutputFile ParameterType="System.String" Required="true" />
+      <RootFolderName ParameterType="System.String" Required="true" />
+      <ExecutableNames ParameterType="System.String" Required="false" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Class" Language="cs"><![CDATA[
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public class CreateTarGz : Task
+{
+    private const int ExecutableMode = 493;     // 0755
+    private const int RegularMode = 420;        // 0644
+
+    [Required] public string SourceDirectory { get; set; }
+    [Required] public string OutputFile { get; set; }
+    [Required] public string RootFolderName { get; set; }
+
+    // Executables by file name, ";"-separated (in addition to *.sh and *.so)
+    public string ExecutableNames { get; set; }
+
+    public override bool Execute()
+    {
+        string root = Path.GetFullPath(SourceDirectory).TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
+        string output = Path.GetFullPath(OutputFile);
+        string[] executables = (ExecutableNames ?? string.Empty).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        long mtime = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+
+        using (var file = File.Create(output))
+        using (var gzip = new GZipStream(file, CompressionLevel.Optimal))
+        {
+            foreach (string path in Directory.GetFiles(root, "*", SearchOption.AllDirectories))
+            {
+                if (string.Equals(Path.GetFullPath(path), output, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                string name = RootFolderName + "/" + path.Substring(root.Length).Replace('\\', '/');
+                byte[] content = File.ReadAllBytes(path);
+
+                WriteHeader(gzip, name, IsExecutable(path, executables) ? ExecutableMode : RegularMode, content.Length, mtime);
+                gzip.Write(content, 0, content.Length);
+
+                int padding = (512 - (content.Length % 512)) % 512;
+                gzip.Write(new byte[padding], 0, padding);
+            }
+
+            // End of archive: two empty blocks
+            gzip.Write(new byte[1024], 0, 1024);
+        }
+
+        Log.LogMessage(MessageImportance.High, "[+] Linux package created: " + output);
+        return true;
+    }
+
+    // The named executables, scripts and native libraries
+    private static bool IsExecutable(string path, string[] executables)
+    {
+        string fileName = Path.GetFileName(path);
+        foreach (string executable in executables)
+            if (string.Equals(fileName, executable.Trim(), StringComparison.Ordinal))
+                return true;
+
+        string extension = Path.GetExtension(path);
+        return extension.Equals(".sh", StringComparison.OrdinalIgnoreCase) ||
+               extension.Equals(".so", StringComparison.OrdinalIgnoreCase);
+    }
+
+    // POSIX ustar header of a regular file (owner root:root)
+    private static void WriteHeader(Stream stream, string name, int mode, long size, long mtime)
+    {
+        string prefix = string.Empty;
+        if (name.Length > 100)
+        {
+            int split = name.LastIndexOf('/', Math.Min(155, name.Length - 1));
+            if ((split <= 0) || ((name.Length - split - 1) > 100))
+                throw new InvalidOperationException("Path too long for a tar archive: " + name);
+
+            prefix = name.Substring(0, split);
+            name = name.Substring(split + 1);
+        }
+
+        var header = new byte[512];
+        Put(header, 0, 100, name);
+        PutOctal(header, 100, 8, mode);
+        PutOctal(header, 108, 8, 0);            // uid
+        PutOctal(header, 116, 8, 0);            // gid
+        PutOctal(header, 124, 12, size);
+        PutOctal(header, 136, 12, mtime);
+        Put(header, 148, 8, "        ");        // checksum placeholder (spaces)
+        header[156] = (byte)'0';                // regular file
+        Put(header, 257, 6, "ustar");           // "ustar\0"
+        Put(header, 263, 2, "00");
+        Put(header, 265, 32, "root");
+        Put(header, 297, 32, "root");
+        Put(header, 345, 155, prefix);
+
+        long checksum = 0;
+        foreach (byte b in header) checksum += b;
+        Put(header, 148, 8, Convert.ToString(checksum, 8).PadLeft(6, '0') + "\0 ");
+
+        stream.Write(header, 0, header.Length);
+    }
+
+    private static void Put(byte[] header, int offset, int length, string value)
+    {
+        byte[] bytes = Encoding.ASCII.GetBytes(value);
+        Array.Copy(bytes, 0, header, offset, Math.Min(bytes.Length, length));
+    }
+
+    // Zero-padded octal number, terminated by NUL (the header is zero-filled)
+    private static void PutOctal(byte[] header, int offset, int length, long value) =>
+        Put(header, offset, length, Convert.ToString(value, 8).PadLeft(length - 1, '0'));
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+
+  <!-- Runs after the project's own AfterTargets="Publish" targets (e.g. CopyLinuxScripts) -->
+  <Target Name="CreateLinuxPackage"
+          AfterTargets="Publish;CopyLinuxScripts"
+          Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+    <PropertyGroup>
+      <_LinuxPublishDir>$([System.IO.Path]::GetFullPath($([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(PublishDir)'))))</_LinuxPublishDir>
+      <_LinuxPackageName>$(AssemblyName)-$(Version)-$(RuntimeIdentifier)</_LinuxPackageName>
+      <_LinuxPackageFile>$([System.IO.Path]::GetDirectoryName($(_LinuxPublishDir.TrimEnd('\').TrimEnd('/'))))\$(_LinuxPackageName).tar.gz</_LinuxPackageFile>
+    </PropertyGroup>
+
+    <CreateTarGz SourceDirectory="$(_LinuxPublishDir)"
+                 OutputFile="$(_LinuxPackageFile)"
+                 RootFolderName="$(_LinuxPackageName)"
+                 ExecutableNames="$(AssemblyName);createdump" />
+  </Target>
+
+</Project>

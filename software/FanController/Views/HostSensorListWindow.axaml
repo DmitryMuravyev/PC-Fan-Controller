@@ -1,0 +1,495 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FanController.Views.HostSensorListWindow"
+        x:DataType="vm:HostSensorListViewModel"
+        Title="{lz:Localize HostSensorListWindowTitle}"
+        MinWidth="1024" 
+        MinHeight="640"
+        Width="1024"
+        Height="640">
+
+    <!-- Styles (or reference from App.axaml) -->
+    <Window.Styles>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+            <!--<Setter Property="FontSize" Value="10.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.paramLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,16,0"/>
+            <Setter Property="Opacity" Value="0.75"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.readOnly">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.45"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+    </Window.Styles>
+
+
+    <!-- Root: header pinned at top, scrollable body, footer pinned at bottom -->
+    <DockPanel>
+
+        <!-- HEADER -->
+        <!-- There's no Header in this window, so skip it -->
+        <!--
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+        </Border>
+        -->
+
+        <!-- FOOTER -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <!-- Close -->
+                <Button Content="{lz:Localize ButtonCloseCaption}"
+                        Margin="0,0,8,0"
+                        Click="OnCloseClick" />
+                <!-- Add -->
+                <Button Content="{lz:Localize ButtonAddSelectedCaption}"
+                        Classes="accent"
+                        Click="OnAddClick"
+                        IsEnabled="{Binding SelectedNode?.CanBeAdded,
+                                            FallbackValue=False,
+                                            TargetNullValue=False}"
+                        ToolTip.Tip="{lz:Localize ButtonAddSelectedTip}" />
+            </StackPanel>
+        </Border>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="250" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" MinWidth="400" />
+            </Grid.ColumnDefinitions>
+
+            <!-- TREE -->
+            <TreeView Grid.Column="0"
+                      ItemsSource="{Binding DeviceTree}"
+                      SelectedItem="{Binding SelectedNode}"
+                      SelectionMode="Single">
+
+                <TreeView.DataTemplates>
+
+                    <TreeDataTemplate DataType="vm:HostSensorTreeNode"
+                                      ItemsSource="{Binding Children}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0"
+                                        Orientation="Horizontal"
+                                        Spacing="6">
+                                <!-- Icon based on hardware type -->
+                                <Image Source="{Binding HardwareType,
+                                           Converter={x:Static cv:HardwareTypeIconConverter.Instance}}"
+                                   Width="16"
+                                   Height="16"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality">
+                                </Image>
+
+                                <TextBlock Text="{Binding Name}"
+                                           VerticalAlignment="Center"
+                                           FontWeight="SemiBold">
+                                    <ToolTip.Tip>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="HardwareType" />
+                                            <Binding Source="Tip" />
+                                        </MultiBinding>
+                                   </ToolTip.Tip>
+                                </TextBlock>
+                            </StackPanel>
+                            
+                            <!-- If the sensor already in the list - show the checkmark -->
+                            <Image Grid.Column="1" 
+                                   Margin="10,0"
+                                   Width="16" 
+                                   Height="16"
+                                   HorizontalAlignment="Center"
+                                   IsVisible="{Binding AlreadyExists}">
+                                <Image.Source>
+                                    <DrawingImage Drawing="{ReflectionBinding 
+                                                  Source={x:True}, 
+                                                  Converter={x:Static cv:BoolToCheckmarkConverter.Instance}}" />
+                                </Image.Source>
+                            </Image>
+                            <!--
+                            <CheckBox Grid.Column="1"
+                                      Margin="10,0"
+                                      IsVisible="{Binding !IsDevice}"
+                                      IsChecked="{Binding Selected}" />
+                            -->
+
+                        </Grid>
+                    </TreeDataTemplate>
+
+                </TreeView.DataTemplates>
+
+                <!-- Expand all nodes -->
+                <TreeView.Styles>
+                    <Style Selector="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="True"/>
+                    </Style>
+                </TreeView.Styles>
+
+            </TreeView>
+
+            <!-- Splitter for resizing columns -->
+            <GridSplitter Grid.Column="1"
+                          ResizeDirection="Columns"
+                          Background="Transparent"
+                          Width="4">
+                <GridSplitter.Template>
+                    <ControlTemplate>
+                        <Grid>
+                            <!-- Subtle separator line -->
+                            <Rectangle Width="1"
+                                       HorizontalAlignment="Center"
+                                       Fill="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                       Opacity="0.3"/>
+
+                            <!-- Visible drag handle that appears on hover -->
+                            <Border x:Name="Handle"
+                                    Width="4"
+                                    CornerRadius="2"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Height="48"
+                                    Background="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                    Opacity="0">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                                    </Transitions>
+                                </Border.Transitions>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </GridSplitter.Template>
+
+                <GridSplitter.Styles>
+                    <Style Selector="GridSplitter:pointerover /template/ Border#Handle">
+                        <Setter Property="Opacity" Value="1"/>
+                    </Style>
+                    <Style Selector="GridSplitter:pressed /template/ Border#Handle">
+                        <Setter Property="Opacity" Value="1"/>
+                        <Setter Property="Background"
+                                Value="{DynamicResource SystemAccentColor}"/>
+                    </Style>
+                </GridSplitter.Styles>
+            </GridSplitter>
+
+            <!-- DETAIL PANEL -->
+            <ScrollViewer Grid.Column="2" Padding="12">
+                <StackPanel DataContext="{Binding SelectedNode}"
+                            Spacing="8">
+
+                    <!-- No selection -->
+                    <TextBlock Text="{lz:Localize SelectNodeCaption}"
+                               Padding="12"
+                               FontSize="15"
+                               Opacity="0.55"
+                               IsVisible="{Binding $parent[StackPanel].DataContext,
+                                                   Converter={x:Static ObjectConverters.IsNull}}"/>
+
+                    <!-- Device details -->
+                    <Border IsVisible="{Binding IsDevice,
+                                                FallbackValue=False,
+                                                TargetNullValue=False}"
+                            CornerRadius="10"
+                            Padding="12">
+                        <Border.Background>
+                            <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                             Opacity="0.33"/>
+                        </Border.Background>
+
+                        <!-- Device Name -->
+                        <StackPanel Spacing="10"
+                                    Grid.IsSharedSizeScope="True">
+
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="{lz:Localize HostDeviceDetailsHeaderCaption}"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Opacity="0.55" />
+                            </StackPanel>
+
+                            <Separator Margin="0" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="dlbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostDeviceTypeParameterFullName}" 
+                                           ToolTip.Tip="{lz:Localize HostDeviceTypeParameterTip}" />
+                                <TextBlock Grid.Column="1" Classes="readOnly">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="HardwareType" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="dlbl"/>
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           VerticalAlignment="Top"
+                                           Text="{lz:Localize HostDeviceInfoParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostDeviceInfoParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly"
+                                           Text="{Binding Info, 
+                                                          FallbackValue='-',
+                                                          TargetNullValue='-'}"
+                                           TextWrapping="Wrap"/>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="dlbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostDeviceChildrenParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostDeviceChildrenParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly"
+                                           Text="{Binding Children.Count}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Sensor details -->
+                    <Border IsVisible="{Binding IsSensor, 
+                                                FallbackValue=False,
+                                                TargetNullValue=False}"
+                            CornerRadius="10"
+                            Padding="12">
+                        <Border.Background>
+                            <SolidColorBrush Color="{DynamicResource SystemBaseLowColor}" 
+                                             Opacity="0.33"/>
+                        </Border.Background>
+
+                        <StackPanel Spacing="10"
+                                    Grid.IsSharedSizeScope="True">
+
+                            <!-- Sensor Name + Status Indicator -->
+                            <StackPanel Spacing="5">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="18"
+                                               FontWeight="SemiBold" />
+                                    <Ellipse Width="12" Height="12"
+                                              Margin="0,0,6,0"
+                                              Fill="{Binding Status,
+                                                     Converter={x:Static cv:SensorStatusToBackgroundConverter.Instance},
+                                                     ConverterParameter=True,
+                                                     Mode=OneWay}" />
+                                </StackPanel>
+
+                                <TextBlock Text="{lz:Localize HostSensorDetailsHeaderCaption}"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Opacity="0.55" />
+                            </StackPanel>
+
+                            <Separator Margin="0" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostSensorTemperatureParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorTemperatureParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           FontSize="18" FontWeight="SemiBold"
+                                           Classes="readOnly">
+                                    <TextBlock.Foreground>
+                                        <MultiBinding Converter="{x:Static cv:TemperatureToColorConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="Temperature" />
+                                            <Binding Path="MaxTemperature" />
+                                            <Binding Path="CritTemperature" />
+                                        </MultiBinding>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                            <Binding Path="Temperature"/>
+                                            <ReflectionBinding Path="[TemperatureParameterShortFormat]"
+                                                                Source="{x:Static lz:LocalizationService.Instance}"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostSensorMaxTemperatureParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorMaxTemperatureParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly">
+                                    <TextBlock.Foreground>
+                                        <MultiBinding Converter="{x:Static cv:TemperatureToColorConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="MaxTemperature" />
+                                            <Binding Path="MaxTemperature" />
+                                            <Binding Path="CritTemperature" />
+                                        </MultiBinding>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                            <Binding Path="MaxTemperature" />
+                                            <ReflectionBinding Path="[TemperatureParameterShortFormat]"
+                                                                Source="{x:Static lz:LocalizationService.Instance}"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostSensorCritTemperatureParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorCritTemperatureParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly">
+                                    <TextBlock.Foreground>
+                                        <MultiBinding Converter="{x:Static cv:TemperatureToColorConverter.Instance}" Mode="OneWay">
+                                            <Binding Path="CritTemperature" />
+                                            <Binding Path="MaxTemperature" />
+                                            <Binding Path="CritTemperature" />
+                                        </MultiBinding>
+                                    </TextBlock.Foreground>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}">
+                                            <Binding Path="CritTemperature"/>
+                                            <ReflectionBinding Path="[TemperatureParameterShortFormat]"
+                                                                Source="{x:Static lz:LocalizationService.Instance}"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostSensorIsValidParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorIsValidParameterTip}" />
+                                <Image Grid.Column="1" 
+                                       Width="16" 
+                                       Height="16"
+                                       HorizontalAlignment="Left">
+                                    <Image.Source>
+                                        <DrawingImage Drawing="{Binding IsValid, 
+                                                      Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                                      Mode=OneWay}"/>
+                                    </Image.Source>
+                                </Image>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostSensorPathParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorPathParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly"
+                                           FontFamily="Monospace"
+                                           Text="{Binding Path}"
+                                           TextWrapping="Wrap" />
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           Text="{lz:Localize HostSensorIDParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorIDParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly"
+                                           FontFamily="Monospace"
+                                           Text="{Binding IDText}" />
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="slbl"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           Classes="paramLabel"
+                                           VerticalAlignment="Top"
+                                           Text="{lz:Localize HostSensorInfoParameterFullName}"
+                                           ToolTip.Tip="{lz:Localize HostSensorInfoParameterTip}" />
+                                <TextBlock Grid.Column="1"
+                                           Classes="readOnly"
+                                           Text="{Binding Info, 
+                                                          FallbackValue='-',
+                                                          TargetNullValue='-'}"
+                                           TextWrapping="Wrap" />
+                            </Grid>
+
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+        </Grid>
+    </DockPanel>
+
+</Window>

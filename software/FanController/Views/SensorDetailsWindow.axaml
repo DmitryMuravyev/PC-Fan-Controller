@@ -1,0 +1,544 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ct="using:FanController.Contracts"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:lc="using:FanController.Controls"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
+        xmlns:bh="using:FanController.Behaviors"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="FanController.Views.SensorDetailsWindow"
+        x:DataType="vm:SensorDetailsViewModel"
+        Title="{lz:Localize SensorDetailsWindowTitle}"
+        MinWidth="720"
+        MaxWidth="720"
+        MinHeight="512">
+
+    <!-- Styles (or reference from App.axaml) -->
+    <Window.Styles>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+            <!--<Setter Property="FontSize" Value="10.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.paramLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,16,0"/>
+            <Setter Property="Opacity" Value="0.75"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+        </Style>
+        <Style Selector="TextBlock.readOnly">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.45"/>
+            <!--<Setter Property="FontSize" Value="12.5"/>-->
+            <Setter Property="FontStyle" Value="Italic"/>
+        </Style>
+
+        <!-- Force DataGrid to select only rows, but not the individual cells -->
+        <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+
+        <!-- Custom ValidationResult font size -->
+        <Style Selector="NumericUpDown DataValidationErrors TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="{DynamicResource StatusWarning}"/>
+            <Setter Property="Margin" Value="4,0,4,0"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- NumericUpDown Custom Highlight -->
+        <Style Selector="NumericUpDown.CustomHighlight /template/ TextBox:pointerover /template/ Border#PART_BorderElement">
+            <!-- <Setter Property="BorderBrush" Value="{DynamicResource StatusWarning}" /> -->
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="2" />
+        </Style>
+    </Window.Styles>
+
+
+    <!-- Root: header pinned at top, scrollable body, footer pinned at bottom -->
+    <DockPanel>
+
+        <!-- HEADER -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Orientation="Vertical" Spacing="5">
+                <TextBlock Text="{Binding Name, Mode=OneTime}"
+                           FontSize="18"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="{lz:Localize SensorDetailsHeaderCaption}"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Opacity="0.55" />
+            </StackPanel>
+        </Border>
+
+        <!-- FOOTER -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="10,10">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <!-- Dirty indicator -->
+                <TextBlock Grid.Column="0"
+                           Text="{lz:Localize UnsavedChangesCaption}"
+                           Foreground="{DynamicResource StatusWarning}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding IsDirty}"/>
+                <!-- Cancel -->
+                <Button Grid.Column="1"
+                        Content="{lz:Localize ButtonCancelCaption}"
+                        Margin="0,0,10,0"
+                        Click="OnCancelClick" />
+                <!-- Save / Add -->
+                <Button Grid.Column="2"
+                        Classes="accent"
+                        Click="OnSaveClick"
+                        IsEnabled="{Binding IsValid}">
+                    <Button.Content>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="IsAddWindow"/>
+                            <ReflectionBinding Path="[ButtonAddSensorCaption]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonSaveConfigCaption]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </Button.Content>
+                    <ToolTip.Tip>
+                        <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}">
+                            <Binding Path="IsAddWindow"/>
+                            <ReflectionBinding Path="[ButtonAddSensorTip]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when true  -->
+                            <ReflectionBinding Path="[ButtonSaveConfigTip]"
+                                               Source="{x:Static lz:LocalizationService.Instance}"/>    <!-- shown when false -->
+                        </MultiBinding>
+                    </ToolTip.Tip>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- BODY - scrollable parameter list -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <!--
+                Grid.IsSharedSizeScope="True" makes SharedSizeGroup="lbl"
+                work across ALL child Grids, so every label column aligns.
+            -->
+            <StackPanel Margin="16,14,16,20"
+                        Spacing="10"
+                        Grid.IsSharedSizeScope="True">
+
+
+                <!-- IDENTITY -->
+                <TextBlock Text="{lz:Localize SectionIdentityName}" Classes="groupHeader"/>
+
+                <!-- Index -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorIndexParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorIndexParameterTip}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Index}" Classes="readOnly"/>
+                </Grid>
+
+                <!-- Type -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorTypeParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorTypeParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:EnumToLocalizedTextConverter.Instance}" Mode="OneWay">
+                                <Binding Path="Type" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+
+                <!-- Serial Number -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                                Text="{lz:Localize SensorSerialNumberParameterFullName}" 
+                                Classes="paramLabel"
+                                ToolTip.Tip="{lz:Localize SensorSerialNumberParameterTip}" />
+                    <TextBlock Grid.Column="1"
+                                Text="{Binding ReadableSerialNumber}"
+                                FontFamily="Monospace"
+                                Classes="readOnly"/>
+                </Grid>
+
+                <!-- Name -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorNameParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorNameParameterTip}" />
+                    <!-- Letters only, max 20 chars -->
+                    <TextBox Grid.Column="1" 
+                             Width="150"
+                             HorizontalAlignment="Left"
+                             Text="{Binding Name, Mode=TwoWay}">
+                        <i:Interaction.Behaviors>
+                            <bh:TextBoxRestrictionBehavior MaxLength="8" 
+                                                           AllowedPattern="[0-9a-zA-Z !%&amp;&apos;()*+,\-./:;&lt;=&gt;?\[\\\]^_{|}~]"/>
+                        </i:Interaction.Behaviors>
+                    </TextBox>
+                </Grid>
+
+
+                <!-- CONFIGURATION -->
+                <TextBlock Text="{lz:Localize SectionConfigurationName}" Classes="groupHeader"/>
+
+                <!-- Custom Setting for HW Sensors -->
+                <Grid IsVisible="{Binding Type,
+                                          Converter={x:Static cv:EnumEqualConverter.NotInstance},
+                                          ConverterParameter={x:Static ct:TSensorType.SW},
+                                          Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorHardwareConfigParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorHardwareConfigParameterTip}" />
+                    <TextBlock Grid.Column="1" Classes="readOnly">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{x:Static cv:StringFormatConverter.Instance}"
+                                            Mode="OneWay">
+                                <Binding Path="Setting" />
+                                <ReflectionBinding Path="[SensorHardwareConfigParameterFormat]"
+                                                    Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+                
+                <!-- Deletable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{lz:Localize SensorIsDeletableParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorIsDeletableParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding IsDeletable, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- Permanent -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{lz:Localize SensorIsPermanentParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorIsPermanentParameterTip}" />
+                    <Image Grid.Column="1" 
+                           Width="16" 
+                           Height="16"
+                           HorizontalAlignment="Left">
+                        <Image.Source>
+                            <DrawingImage Drawing="{Binding IsPermanent, 
+                                          Converter={x:Static cv:BoolToCheckmarkConverter.Instance},
+                                          Mode=OneWay}"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+
+                <!-- Is Active -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorIsActiveParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorIsActiveParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                        IsChecked="{Binding IsActive}"
+                        OnContent="{lz:Localize SwitchYesCaption}" 
+                        OffContent="{lz:Localize SwitchNoCaption}"/>
+                </Grid>
+
+                <!-- Is Visible -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorIsVisibleParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorIsVisibleParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                        IsChecked="{Binding IsVisible}"
+                        OnContent="{lz:Localize SwitchYesCaption}" 
+                        OffContent="{lz:Localize SwitchNoCaption}"/>
+                </Grid>
+
+                <!-- Is Ignorable -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorIsIgnorableParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorIsIgnorableParameterTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                        IsChecked="{Binding IsIgnorable}"
+                        OnContent="{lz:Localize SwitchYesCaption}" 
+                        OffContent="{lz:Localize SwitchNoCaption}"/>
+                </Grid>
+
+                <!-- Warning Temperature Threshold -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{lz:Localize SensorWarningTempParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorWarningTempParameterTip}" />
+                    <NumericUpDown Grid.Column="1"
+                                   Width="150"
+                                   HorizontalAlignment="Left"
+                                   Value="{Binding WarningThreshold, Mode=TwoWay}"
+                                   Minimum="0" Maximum="255"
+                                   Increment="1"
+                                   FormatString="0"
+                                   ParsingNumberStyle="Integer"/>
+                </Grid>
+
+                <!-- Alarm Temperature Threshold -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{lz:Localize SensorAlarmTempParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorAlarmTempParameterTip}" />
+                    <NumericUpDown Grid.Column="1"
+                                   Width="150"
+                                   HorizontalAlignment="Left"
+                                   Value="{Binding AlarmThreshold, Mode=TwoWay}"
+                                   Minimum="0" Maximum="255"
+                                   Increment="1"
+                                   FormatString="0"
+                                   ParsingNumberStyle="Integer"/>
+                </Grid>
+
+                <!-- Custom Setting for SW Sensors -->
+                <Grid IsVisible="{Binding Type,
+                                          Converter={x:Static cv:EnumEqualConverter.Instance},
+                                          ConverterParameter={x:Static ct:TSensorType.SW},
+                                          Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize SensorSoftwareConfigParameterFullName}" 
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize SensorSoftwareConfigParameterTip}" />
+                    <NumericUpDown Grid.Column="1"
+                                   Width="150"
+                                   HorizontalAlignment="Left"
+                                   Value="{Binding Setting, Mode=TwoWay}"
+                                   Minimum="0" Maximum="65535"
+                                   Increment="1"
+                                   FormatString="0"
+                                   ParsingNumberStyle="Integer"/>
+                </Grid>
+
+
+                <!-- FAN IMPACT -->
+                <TextBlock Text="{lz:Localize SectionFanImpactName}" Classes="groupHeader"/>
+
+                <!-- Fan Impact parameters with per-row validation -->
+                <DataGrid x:Name="FanOutputsDataGrid"
+                          ItemsSource="{Binding FanOutputs}"
+                          AutoGenerateColumns="False"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="False"
+                          IsReadOnly="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="All"
+                          SelectionMode="Single"
+                          SelectedItem="{Binding CurrentFanOutput, Mode=TwoWay}"
+                          VerticalScrollBarVisibility="Auto"
+                          RowHeight="40">
+                    <DataGrid.Columns>
+
+                        <!-- Fan Name -->
+                        <DataGridTextColumn Width="*"
+                                            MinWidth="70"
+                                            CanUserReorder="False"
+                                            IsReadOnly="True"
+                                            Binding="{Binding FanName, Mode=OneWay}" >
+                            <DataGridTextColumn.Header>
+                                <TextBlock Text="{lz:Localize ColumnHeaderFanNameCaption}" 
+                                           ToolTip.Tip="{lz:Localize ColumnHeaderFanNameTip}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <!-- Low Threshold -->
+                        <DataGridTemplateColumn Width="140"
+                                                CanUserReorder="False">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="{lz:Localize ColumnHeaderFanLowThresholdCaption}" 
+                                           ToolTip.Tip="{lz:Localize ColumnHeaderFanLowThresholdTip}" />
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FanOutput">
+                                    <NumericUpDown Classes="CustomHighlight"
+                                                   Value="{Binding LowThreshold, Mode=TwoWay}"
+                                                   Minimum="0" Maximum="255"
+                                                   Increment="1"
+                                                   FormatString="0"
+                                                   ParsingNumberStyle="Integer"
+                                                   BorderThickness="0"
+                                                   CornerRadius="0" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- High Threshold -->
+                        <DataGridTemplateColumn Width="140"
+                                                CanUserReorder="False">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="{lz:Localize ColumnHeaderFanHighThresholdCaption}" 
+                                           ToolTip.Tip="{lz:Localize ColumnHeaderFanHighThresholdTip}" />
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FanOutput">
+                                    <NumericUpDown Classes="CustomHighlight"
+                                                   Value="{Binding HighThreshold, Mode=TwoWay}"
+                                                   Minimum="0" Maximum="255"
+                                                   Increment="1"
+                                                   FormatString="0"
+                                                   ParsingNumberStyle="Integer"
+                                                   BorderThickness="0"
+                                                   CornerRadius="0" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- Impact slider -->
+                        <DataGridTemplateColumn Width="150"
+                                                MinWidth="150"
+                                                CanUserReorder="True">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="{lz:Localize ColumnHeaderFanImpactCaption}" 
+                                           ToolTip.Tip="{lz:Localize ColumnHeaderFanImpactTip}" />
+                            </DataGridTemplateColumn.Header>
+
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FanOutput">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          Margin="8,0">
+
+                                        <!-- lc:CompactSlider Classes="hasTicks" -->
+                                        <lc:CompactSlider Grid.Column="0"
+                                                Minimum="0"
+                                                Maximum="1"
+                                                TickFrequency="0.0666666666666667"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding Impact}"
+                                                VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Classes="deactivatable"
+                                                   Width="50"
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Margin="4,0,0,0"
+                                                   Text="{Binding Impact, Converter={x:Static cv:DoubleToPercentConverter.Instance}, Mode=OneWay}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <!-- Sensor Unavailable Impact slider -->
+                        <DataGridTemplateColumn Width="150"
+                                                MinWidth="150"
+                                                CanUserReorder="True">
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="{lz:Localize ColumnHeaderUnavailableSensorFanImpactCaption}" 
+                                           ToolTip.Tip="{lz:Localize ColumnHeaderUnavailableSensorFanImpactTip}" />
+                            </DataGridTemplateColumn.Header>
+
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:FanOutput">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          Margin="8,0">
+
+                                        <!-- lc:CompactSlider Classes="hasTicks" -->
+                                        <lc:CompactSlider Grid.Column="0"
+                                                Minimum="0"
+                                                Maximum="1"
+                                                TickFrequency="0.0666666666666667"
+                                                IsSnapToTickEnabled="True"
+                                                Value="{Binding UnavailableImpact}"
+                                                VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Classes="deactivatable"
+                                                   Width="50"
+                                                   TextAlignment="Right"
+                                                   VerticalAlignment="Center"
+                                                   Margin="4,0,0,0"
+                                                   Text="{Binding UnavailableImpact, Converter={x:Static cv:DoubleToPercentConverter.Instance}, Mode=OneWay}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Clone Selected Button -->
+                <Button Content="{lz:Localize ButtonCloneSelectedCaption}"
+                        HorizontalAlignment="Right"
+                        IsEnabled="{Binding HasCurrentFanOutput}"
+                        Click="OnCloneSelectedClick" />
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

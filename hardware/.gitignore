@@ -1,0 +1,10 @@
+# BOM exports (the BOM is not published, see README.md)
+*BOM*.csv
+*BOM*.xlsx
+
+# Other EasyEDA fabrication exports
+*PickAndPlace*.csv
+*.pdf
+
+# Backups
+*.bak

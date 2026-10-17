@@ -1,0 +1,97 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <UserSecretsId>dotnet-FanController.Service-405c4b31-ce0d-4651-9ff0-b3a8830c64c4</UserSecretsId>
+  </PropertyGroup>
+
+  <!-- Provides full ASP.NET Core including Kestrel and gRPC -->
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <!-- GC properties -->
+  
+  <PropertyGroup>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+  
+  <!-- Platform-specific constants -->
+
+  <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('win')) or '$(RuntimeIdentifier)' == ''">
+    <DefineConstants>WINDOWS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+    <DefineConstants>LINUX</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Common packages-->
+  
+  <ItemGroup>
+    <PackageReference Include="HidSharp" Version="2.6.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.12" />
+    <PackageReference Include="protobuf-net.Grpc.AspNetCore" Version="1.3.14" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <!-- Platform-specific packages-->
+  
+  <ItemGroup Condition="$(RuntimeIdentifier.StartsWith('win')) or '$(RuntimeIdentifier)' == ''">
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+  </ItemGroup>
+
+  <!-- Project references -->
+  
+  <ItemGroup>
+    <ProjectReference Include="..\FanController.Contracts\FanController.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="runtimeconfig.template.json" />
+  </ItemGroup>
+
+  <!-- Windows publish scripts -->
+
+  <Target Name="CopyWindowsScripts" AfterTargets="Publish" Condition="$(RuntimeIdentifier.StartsWith('win')) or '$(RuntimeIdentifier)' == ''">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Scripts\install-service.ps1" DestinationFiles="$(PublishDir)install-service.ps1" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Scripts\uninstall-service.ps1" DestinationFiles="$(PublishDir)uninstall-service.ps1" />
+    <Message Text="[+] Windows scripts copied to publish directory." Importance="High" />
+  </Target>
+
+  <!-- Linux publish scripts -->
+
+  <Target Name="CopyLinuxScripts" AfterTargets="Publish" Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Scripts\install-service.sh" DestinationFiles="$(PublishDir)install-service.sh" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\Scripts\uninstall-service.sh" DestinationFiles="$(PublishDir)uninstall-service.sh" />
+    <Message Text="[+] Linux scripts copied to publish directory." Importance="High" />
+  </Target>
+
+  <!-- Trimmer roots -->
+  
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Grpc.AspNetCore.Server" />
+    <TrimmerRootAssembly Include="Grpc.Core.Api" />
+    <TrimmerRootAssembly Include="Grpc.Net.Common" />
+    <TrimmerRootAssembly Include="protobuf-net.Core" />
+    <TrimmerRootAssembly Include="protobuf-net" />
+    <TrimmerRootAssembly Include="protobuf-net.Grpc.AspNetCore" />
+    <TrimmerRootAssembly Include="protobuf-net.Grpc" />
+    <TrimmerRootAssembly Include="FanController.Contracts" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
+
+</Project>

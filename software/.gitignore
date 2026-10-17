@@ -1,0 +1,52 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rm64/
+[Ll]og/
+[Ll]ogs/
+
+# Publish output and packages
+[Pp]ublish/
+*.tar.gz
+*.zip
+*.nupkg
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.slnLaunch.user
+
+# JetBrains Rider / VS Code
+.idea/
+*.sln.iml
+.vscode/
+
+# Test results and coverage
+TestResults/
+[Tt]est[Rr]esult*/
+coverage*.json
+coverage*.xml
+*.coverage
+
+# Local development settings (may contain machine-specific values)
+appsettings.Development.json
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Tools and temporary files
+*.tmp
+*.bak
+*.swp
+*.log
+*.pcapng

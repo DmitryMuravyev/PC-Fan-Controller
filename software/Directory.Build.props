@@ -1,0 +1,15 @@
+<Project>
+
+  <!-- Product information shared by all projects (the only place to change the version) -->
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <!-- Optional pre-release label, e.g. beta.1 (empty for a release) -->
+    <VersionSuffix></VersionSuffix>
+
+    <Product>Fan Controller</Product>
+    <Authors>Dmitry Muravyev</Authors>
+    <Company>Dmitry Muravyev</Company>
+    <Copyright>Copyright (c) 2026 Dmitry Muravyev</Copyright>
+  </PropertyGroup>
+
+</Project>

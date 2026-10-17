@@ -1,0 +1,103 @@
+name: Bug report
+description: Something doesn't work as expected in the firmware, the service, the application or the hardware.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Please check the existing issues first.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Firmware
+        - Service
+        - Application (UI)
+        - Hardware
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the problem. For the controller, also what the display, the error LED and the buzzer show.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: input
+    id: firmware-version
+    attributes:
+      label: Firmware version
+      description: Shown on the display at startup (under the logo) and on the System tab of the application.
+      placeholder: e.g. 1.3
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Application / service version
+      description: Shown in the host list (service) and in the release file names. Leave empty if the software is not used.
+      placeholder: e.g. 1.0.0
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      description: The computer the controller is connected to, or the one the application runs on.
+      multiple: true
+      options:
+        - Windows 10
+        - Windows 11
+        - Linux
+        - Not relevant
+
+  - type: input
+    id: os-details
+    attributes:
+      label: OS details
+      description: Version or distribution (e.g. Windows 11 24H2, Ubuntu 24.04).
+
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Hardware setup
+      description: Board revision, power option (Molex, Power 12V + USB, ...), connected fans (model, 2/3/4-wire) and sensors.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        The relevant part of the service log
+        (Windows: C:\ProgramData\FanController\Logs, Linux: /var/log/fancontroller)
+        and/or of the firmware UART log.
+      render: text
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Photos, screenshots, configuration backup (JSON).

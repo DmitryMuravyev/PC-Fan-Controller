@@ -1,0 +1,474 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:FanController.ViewModels"
+        xmlns:lc="using:FanController.Controls"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lz="using:FanController.Localization"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="840"
+        x:Class="FanController.Views.BuzzerOptionsWindow"
+        x:DataType="vm:SystemViewModel"
+        Title="{lz:Localize BuzzerOptionsWindowTitle}"
+        WindowStartupLocation="CenterOwner"
+        MinWidth="500"
+        MaxWidth="500"
+        MinHeight="512"
+        MaxHeight="840"
+        Height="840">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.groupHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+        </Style>
+        <Style Selector="TextBlock.paramLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4,0,16,0"/>
+            <Setter Property="Opacity" Value="0.75"/>
+        </Style>
+
+        <!-- Buzzer option switches -->
+        <Style Selector="ToggleSwitch">
+            <Setter Property="OnContent" Value="{lz:Localize SwitchOnCaption}"/>
+            <Setter Property="OffContent" Value="{lz:Localize SwitchOffCaption}"/>
+        </Style>
+
+        <!-- Current alarm / warning state -->
+        <Style Selector="lc|StatusLabel">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{DynamicResource StatusError}"/>
+            <Setter Property="ToolTip.Tip" Value="{lz:Localize BuzzerOptionsStateTip}"/>
+        </Style>
+        <Style Selector="lc|StatusLabel.warning">
+            <Setter Property="Background" Value="{DynamicResource StatusWarning}"/>
+        </Style>
+    </Window.Styles>
+
+    <!-- Root: header pinned at top, scrollable body, footer pinned at bottom -->
+    <DockPanel>
+
+        <!-- HEADER -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Orientation="Vertical" Spacing="4">
+                <TextBlock Text="{lz:Localize BuzzerOptionsHeaderCaption}"
+                           FontSize="15" FontWeight="SemiBold"/>
+                <TextBlock Text="{lz:Localize BuzzerOptionsHeaderTip}"
+                           FontSize="11" Opacity="0.55"/>
+            </StackPanel>
+        </Border>
+
+        <!-- FOOTER -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="10,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <!-- Done -->
+                <Button Grid.Column="1"
+                        Content="{lz:Localize ButtonCloseCaption}"
+                        Classes="accent"
+                        Click="OnDoneClick"
+                        ToolTip.Tip="{lz:Localize ButtonDoneTip}" />
+            </Grid>
+        </Border>
+
+        <!-- BODY - scrollable parameter list -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+            <!--
+                Grid.IsSharedSizeScope="True" makes the SharedSizeGroup columns
+                work across ALL child Grids, so labels and states align.
+                Each row: label | buzzer option switch | current state.
+            -->
+            <StackPanel Margin="16,14,16,20"
+                        Spacing="10"
+                        Grid.IsSharedSizeScope="True">
+
+                <!-- ALARMS -->
+                <TextBlock Text="{lz:Localize SectionAlarmsName}" Classes="groupHeader"/>
+
+                <!-- Fatal Failure -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmFailureFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmFailureTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmGeneralFailure}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmGeneralFailure}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmGeneralFailure" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Critical Temperature -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmTempFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmTempTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmTemperature}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmTemperature}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmTemperature" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Critical Power -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmPowerFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmPowerTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmPower}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmPower}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmPower" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Low RAM -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmLowRamFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmLowRamTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmLowRAM}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmLowRam}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmLowRam" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Fan Failed -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmFanFailedFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmFanFailedTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmFanFailed}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmFanFailed}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmFanFailed" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- MAX31790 Communication Error -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmMaxFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmMaxTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmMAX}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmMAX}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmMAX" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Digital Potentiometers Communication Error -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmPotFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmPotTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmPOTs}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmPOTs}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmPOTs" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Fan Power Error -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusCriticalFanPowerFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusCriticalFanPowerTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmFanPower}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmFanPower}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmFanPower" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Fan RPM Error -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusCriticalFanSpeedFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusCriticalFanSpeedTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmFanRPM}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmFanRPM}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmFanRPM" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Bad Sensor -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusAlarmBadSensorFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusAlarmBadSensorTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionAlarmBadSensor}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    IsActive="{Binding SystemStateDto.StatusAlarmBadSensor}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusAlarmBadSensor" />
+                                <ReflectionBinding Path="[AlarmCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- WARNINGS -->
+                <TextBlock Text="{lz:Localize SectionWarningsName}" Classes="groupHeader"/>
+
+                <!-- Warning Temperature -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusTempWarningFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusTempWarningTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionWarningTemperature}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    Classes="warning"
+                                    IsActive="{Binding SystemStateDto.StatusWarningTemperature}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusWarningTemperature" />
+                                <ReflectionBinding Path="[WarningCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Fan Power Warning -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusLowFanPowerFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusLowFanPowerTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionWarningFanPower}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    Classes="warning"
+                                    IsActive="{Binding SystemStateDto.StatusWarningFanPower}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusWarningFanPower" />
+                                <ReflectionBinding Path="[WarningCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Low Fan RPM -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusLowFanSpeedFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusLowFanSpeedTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionWarningFanRPM}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    Classes="warning"
+                                    IsActive="{Binding SystemStateDto.StatusWarningFanRPM}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusWarningFanRPM" />
+                                <ReflectionBinding Path="[WarningCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+                <!-- Wrong Sensor Configuration -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="lbl"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="state"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{lz:Localize ControllerStatusBadSensorFullName}"
+                               Classes="paramLabel"
+                               ToolTip.Tip="{lz:Localize ControllerStatusBadSensorTip}" />
+                    <ToggleSwitch Grid.Column="1"
+                                  IsChecked="{Binding BuzzerOptionWarningBadSensor}" />
+                    <lc:StatusLabel Grid.Column="2"
+                                    Classes="warning"
+                                    IsActive="{Binding SystemStateDto.StatusWarningBadSensor}">
+                        <lc:StatusLabel.Text>
+                            <MultiBinding Converter="{x:Static cv:BoolToStringConverter.Instance}" Mode="OneWay">
+                                <Binding Path="SystemStateDto.StatusWarningBadSensor" />
+                                <ReflectionBinding Path="[WarningCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                                <ReflectionBinding Path="[OkCaption]"
+                                                   Source="{x:Static lz:LocalizationService.Instance}"/>
+                            </MultiBinding>
+                        </lc:StatusLabel.Text>
+                    </lc:StatusLabel>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+
+</Window>

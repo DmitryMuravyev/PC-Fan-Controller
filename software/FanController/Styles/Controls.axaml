@@ -1,0 +1,348 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cv="using:FanController.Converters"
+        xmlns:lc="using:FanController.Controls">
+
+    <Design.PreviewWith>
+        <StackPanel Width="300" Spacing="10" Margin="20">
+            <lc:StatusLabel Text="Active" IsActive="True" Background="Green" CornerRadius="6" />
+            <lc:StatusLabel Text="Inactive" IsActive="False" Background="Green" CornerRadius="6" />
+            <lc:RangeStrip RangeStart="0.2" RangeEnd="0.7" />
+            <lc:CompactSlider Value="0.4" />
+            <lc:CompactSlider Classes="rangeTrack" Value="0.4" RangeStart="0.2" RangeEnd="0.7" />
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <!-- Resources -->
+    <Styles.Resources>
+        <!-- Semi-opaque cover of the busy content -->
+        <SolidColorBrush x:Key="BusyOverlayBrush"
+                         Color="{DynamicResource SystemRegionColor}"
+                         Opacity="0.5" />
+    </Styles.Resources>
+
+
+    <!-- StatusLabel: the state brushes / opacity are computed in code (Computed* properties) -->
+    <Style Selector="lc|StatusLabel">
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+
+                    <!-- Background layer -->
+                    <Border x:Name="PART_BorderElement"
+                            Background="{TemplateBinding ComputedBackground}"
+                            Opacity="{TemplateBinding ComputedBackgroundOpacity}"
+                            CornerRadius="{TemplateBinding CornerRadius}"/>
+
+                    <!-- Foreground layer -->
+                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <TextBlock x:Name="PART_TextBlockElement"
+                                   Foreground="{TemplateBinding ComputedForeground}"
+                                   FontWeight="{TemplateBinding ComputedFontWeight}"
+                                   Opacity="{TemplateBinding ComputedForegroundOpacity}"
+                                   Padding="{TemplateBinding Padding}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="{TemplateBinding TextAlignment}">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{x:Static cv:EmptyToPlaceholderConverter.Instance}">
+                                    <Binding Path="Text" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                    <Binding Path="Placeholder" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Border>
+
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+
+    <!-- BusyTabControl: tab headers stay available, the content is disabled and covered while busy -->
+    <Style Selector="lc|BusyTabControl">
+        <Setter Property="Template">
+            <ControlTemplate>
+
+                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Background="{TemplateBinding Background}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}">
+
+                    <DockPanel>
+
+                        <!-- Header -->
+                        <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                        DockPanel.Dock="{TemplateBinding TabStripPlacement}" />
+                        <Grid>
+
+                            <!-- Content (enabled = IsContentEnabled and not IsBusy) -->
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Content="{TemplateBinding SelectedContent}"
+                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}">
+                                <ContentPresenter.IsEnabled>
+                                    <MultiBinding Converter="{x:Static cv:ContentEnabledConverter.Instance}">
+                                        <Binding Path="IsContentEnabled" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                        <Binding Path="IsBusy" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                    </MultiBinding>
+                                </ContentPresenter.IsEnabled>
+                            </ContentPresenter>
+
+                            <!-- Overlay background layer -->
+                            <Border Background="{StaticResource BusyOverlayBrush}"
+                                    IsVisible="{TemplateBinding IsBusy}"
+                                    ZIndex="100">
+
+                                <!-- Overlay message box -->
+                                <Border Width="300"
+                                        Padding="20"
+                                        CornerRadius="8"
+                                        Background="{StaticResource BusyOverlayBrush}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Spacing="12">
+
+                                        <!-- Message -->
+                                        <TextBlock Text="{TemplateBinding BusyMessage}"
+                                                   HorizontalAlignment="Center"
+                                                   TextAlignment="Center"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="SemiBold"/>
+
+                                        <!-- Progress (percent) -->
+                                        <ProgressBar IsIndeterminate="{TemplateBinding IsIndeterminate}"
+                                                     Height="6"
+                                                     Minimum="0.0"
+                                                     Maximum="100.0"
+                                                     Value="{TemplateBinding BusyPercentage}" />
+                                    </StackPanel>
+                                </Border>
+
+                            </Border>
+
+                        </Grid>
+                    </DockPanel>
+                </Border>
+
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+
+    <!-- CompactSlider -->
+    <Style Selector="lc|CompactSlider">
+        <Setter Property="Height" Value="20" />
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="lc:CompactSlider">
+                <Border x:Name="PART_TrackBackground"
+                        Background="Transparent"
+                        Height="{TemplateBinding Height}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch">
+
+                    <Grid HorizontalAlignment="Stretch"
+                          VerticalAlignment="Center"
+                          Height="20">
+
+                        <!-- Background track -->
+                        <Border x:Name="PART_RegularTrack"
+                                CornerRadius="2"
+                                Height="4"
+                                Background="{DynamicResource SystemBaseLowColor}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center" />
+
+                        <!-- Range track (.rangeTrack class) -->
+                        <lc:RangeStrip x:Name="PART_RangeStrip"
+                                       RangeStart="{TemplateBinding RangeStart}"
+                                       RangeEnd="{TemplateBinding RangeEnd}"
+                                       StripHeight="4"
+                                       CornerRadius="2"
+                                       IsVisible="False"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center" />
+
+                        <!-- Track — MUST stretch to fill the Grid -->
+                        <Track x:Name="PART_Track"
+                               Minimum="{TemplateBinding Minimum}"
+                               Maximum="{TemplateBinding Maximum}"
+                               Value="{TemplateBinding Value, Mode=TwoWay}"
+                               Orientation="Horizontal"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch">
+
+                            <Track.DecreaseButton>
+                                <RepeatButton x:Name="PART_DecreaseButton"
+                                              Focusable="False"
+                                              IsHitTestVisible="False"
+                                              MinWidth="0"
+                                              MinHeight="0"
+                                              VerticalAlignment="Stretch"
+                                              HorizontalAlignment="Stretch"
+                                              HorizontalContentAlignment="Stretch"
+                                              VerticalContentAlignment="Stretch">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="Transparent"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Center"
+                                                    Height="4" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseButton>
+
+                            <Track.IncreaseButton>
+                                <RepeatButton Focusable="False"
+                                              IsHitTestVisible="False"
+                                              MinWidth="0"
+                                              MinHeight="0"
+                                              VerticalAlignment="Stretch"
+                                              HorizontalAlignment="Stretch"
+                                              HorizontalContentAlignment="Stretch"
+                                              VerticalContentAlignment="Stretch">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate>
+                                            <Border Background="Transparent"
+                                                    Height="4"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Center" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseButton>
+
+                            <Track.Thumb>
+                                <Thumb MinWidth="0"
+                                       MinHeight="0"
+                                       VerticalAlignment="Center">
+                                    <Thumb.Template>
+                                        <ControlTemplate>
+                                            <Border Background="{DynamicResource SliderThumbBackground}"
+                                                    CornerRadius="3"
+                                                    Width="12"
+                                                    Height="16" />
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+
+                        </Track>
+                    </Grid>
+
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <!-- Disabled state -->
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.4" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+
+        <!-- Pointer-over -->
+        <Style Selector="^ /template/ Track#PART_Track Thumb Border">
+            <Style Selector="^:pointerover">
+                <Setter Property="Background"
+                        Value="{DynamicResource SliderThumbBackgroundPointerOver}" />
+            </Style>
+        </Style>
+
+        <!-- Pressed -->
+        <Style Selector="^ /template/ Track#PART_Track Thumb:pressed Border">
+            <Setter Property="Background"
+                    Value="{DynamicResource SliderThumbBackgroundPressed}" />
+        </Style>
+
+        <!-- Keyboard focus -->
+        <Style Selector="^:focus-visible /template/ Track#PART_Track Thumb Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- .rangeTrack — show RangeStrip, hide regular track -->
+        <Style Selector="^.rangeTrack">
+            <Style Selector="^ /template/ Border#PART_RegularTrack">
+                <Setter Property="IsVisible" Value="False" />
+            </Style>
+            <Style Selector="^ /template/ lc|RangeStrip#PART_RangeStrip">
+                <Setter Property="IsVisible" Value="True" />
+            </Style>
+        </Style>
+
+    </Style>
+
+
+    <!-- RangeStrip (theme brushes; sizes are the code defaults) -->
+    <Style Selector="lc|RangeStrip">
+        <Setter Property="TrackBrush" Value="{DynamicResource SystemBaseLowColor}" />
+        <Setter Property="FillBrush" Value="{DynamicResource SystemBaseMediumColor}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="MinHeight" Value="6" />
+    </Style>
+
+
+    <!-- Three-dot menu button -->
+    <Style Selector="Button.menuButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="MinWidth" Value="28" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Opacity" Value="0.6" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource SystemBaseLowColor}" />
+        </Style>
+
+        <Style Selector="^:pressed">
+            <Setter Property="Opacity" Value="0.8" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.3" />
+        </Style>
+    </Style>
+
+
+    <!-- Icon button -->
+    <Style Selector="Button.iconButton">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="1"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Opacity" Value="0.6" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource SystemBaseLowColor}" />
+        </Style>
+
+        <Style Selector="^:pressed">
+            <Setter Property="Opacity" Value="0.8" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.3" />
+        </Style>
+
+    </Style>
+
+</Styles>
