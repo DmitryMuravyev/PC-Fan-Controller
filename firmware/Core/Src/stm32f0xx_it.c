@@ -47,7 +47,7 @@
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 
-__weak void USB_HID_ProcessRequest()
+__weak void USB_HID_ProcessRequest(void)
 {
   /* NOTE : This function should not be modified, when the callback is needed,
             the USB_HID_ProcessRequest could be implemented in the user file

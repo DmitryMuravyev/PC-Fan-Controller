@@ -70,7 +70,7 @@ The firmware can be built without display support (see [Build options](#build-op
 
 <h1>Flashing</h1>
 
-Each firmware release contains the `.hex` and `.bin` files. There are two ways to flash them.
+Each firmware release (`firmware-vX.Y`, see *Releases* on the repository page) contains the files `FanController-X.Y.hex` and `FanController-X.Y.bin`. There are two ways to flash them.
 
 <h2>Via USB (built-in DFU bootloader)</h2>
 
@@ -84,10 +84,10 @@ The STM32F070 has a built-in USB DFU bootloader, so a programmer is not required
 The same with the command-line tool:
 
 ```
-STM32_Programmer_CLI -c port=usb1 -w FanController.hex -v -rst
+STM32_Programmer_CLI -c port=usb1 -w FanController-1.3.hex -v -rst
 ```
 
-A `.bin` file needs the start address: `-w FanController.bin 0x08000000`.
+A `.bin` file needs the start address: `-w FanController-1.3.bin 0x08000000`.
 
 Firmware updates from the control software (remotely, via the service) are planned for future versions.
 

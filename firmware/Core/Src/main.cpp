@@ -4784,7 +4784,7 @@ void USB_HID_ProcessRequest(void)
 		uint8_t errorCode = Response_OK;
 		TSensor_base * sensor = nullptr;
 
-		do {
+		do {	// Single pass: "break" skips to sending the response
 			// Check whether this request has been received previously
 			// and whether it has already been accepted for execution.
 			bool actionRequested = (systemState.userActionRequest != 0);
@@ -5344,7 +5344,7 @@ void USB_HID_ProcessRequest(void)
 					errorCode = Response_NACK;
 					break;
 			}
-		} while (0);	// F#%$ing goto replacement
+		} while (0);
 
 		// Send response
 		// Since we are reusing the buffer, the next actions can already be considered completed:

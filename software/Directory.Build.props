@@ -12,4 +12,9 @@
     <Copyright>Copyright (c) 2026 Dmitry Muravyev</Copyright>
   </PropertyGroup>
 
+  <!-- No debug symbol files (.pdb) in Release builds and published packages -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
 </Project>

@@ -55,6 +55,21 @@ The **Fans** tab and the host list are shown in the [project README](../README.m
 
 The published packages are self-contained: the target computers don't need a .NET runtime.
 
+## Download
+
+The ready-to-use packages are attached to the `software-vX.Y.Z` releases (*Releases* on the
+repository page):
+
+| File | Contents |
+|---|---|
+| `FanController.Service-<version>-win-x64.zip` | Service for Windows, with the installation scripts |
+| `FanController.Service-<version>-linux-x64.tar.gz` | Service for Linux, with the installation scripts |
+| `FanController-<version>-win-x64.zip` | Application for Windows |
+| `FanController-<version>-linux-x64.tar.gz` | Application for Linux |
+
+Extract the Linux packages with `tar -xzf <file>.tar.gz` (this keeps the executable
+permissions). To build the packages yourself, see below.
+
 ## Building
 
 ```bash
@@ -68,7 +83,8 @@ Publishing uses the profiles in `Properties/PublishProfiles` of each project
 dotnet publish FanController.Service/FanController.Service.csproj -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 ```
 
-The installation scripts are copied into the publish folder of the service.
+The installation scripts are copied into the publish folder of the service. A Linux publish
+also packs the publish folder into a `.tar.gz` file next to it.
 
 ## Installing the service
 
@@ -77,11 +93,16 @@ It runs with administrator / root privileges (USB access, hardware sensors).
 
 ### Windows
 
-Run in an elevated PowerShell (Run as administrator), in the publish folder:
+Run in an elevated PowerShell (Run as administrator), in the extracted service package
+(or the publish folder):
 
 ```powershell
 .\install-service.ps1
 ```
+
+If PowerShell refuses to run the script (execution policy, or a file downloaded from the
+Internet), run it as
+`powershell -ExecutionPolicy Bypass -File .\install-service.ps1`.
 
 - Installs to `C:\Program Files\FanControllerService` and registers the
   `FanControllerService` service (automatic start, restart on failure).
@@ -92,6 +113,8 @@ Run in an elevated PowerShell (Run as administrator), in the publish folder:
 - Uninstall: `.\uninstall-service.ps1`
 
 ### Linux
+
+In the extracted service package (or the publish folder):
 
 ```bash
 sudo bash install-service.sh
