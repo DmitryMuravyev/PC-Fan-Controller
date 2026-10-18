@@ -4,7 +4,7 @@
 
 Fan Controller is an open-source PC fan controller: a USB device that drives up to six fans by PWM and/or supply voltage, according to the readings of its own temperature sensors and of the computer's built-in ones (CPU, GPU, motherboard, drives).
 
-The controller works on its own: it detects the connected fans, configures itself automatically, and shows the current state on its display. Control software for Windows and Linux makes it possible to monitor and fine-tune one or more controllers, locally or over the network.
+The controller works on its own: once it has scanned the connected fans and sensors, it configures itself and shows the current state on its display. Control software for Windows and Linux makes it possible to monitor and fine-tune one or more controllers, locally or over the network.
 
 The project consists of three parts, all published in this repository:
 
@@ -50,7 +50,7 @@ The project consists of three parts, all published in this repository:
 
 <h2>Firmware</h2>
 
-- Automatic configuration and detection of the connected fans;
+- detection of the fan channel hardware, the connected fans and their parameters, and configuration from the results;
 - a total of up to 35 temperature sensors are supported;
 - temperature sensors built into the digiPOTs and the microcontroller are supported (depends on the firmware settings);
 - fan failure detection and redistribution of the load to the remaining fans;
@@ -69,8 +69,9 @@ More details: [software/README.md](/software/README.md).
 <h1>How to use it</h1>
 
 1. **Assemble the board** (see [hardware/README.md](/hardware/README.md) and the [OSHWLab project](https://oshwlab.com/sneer2sneer/pc-fan-controller)).
-2. **Flash the firmware:** take the files from the latest `firmware-v…` release and follow [firmware/README.md](/firmware/README.md#flashing). On the first start, the controller scans its hardware and the connected fans automatically.
+2. **Flash the firmware:** take the files from the latest `firmware-v…` release and follow [firmware/README.md](/firmware/README.md#flashing). On the first start, the controller scans its fan channel hardware.
 3. **Install the service** on the computer the controller is connected to, and start the application: see [software/README.md](/software/README.md). The service is optional: without it, the controller works with its own sensors only.
+4. **Scan the fans and the sensors:** from the controller's menu or from the application. A fan scan takes up to 10 minutes per fan. Firmware built without display support runs these scans automatically on the first start. See [First start and scanning](/firmware/README.md#first-start-and-scanning).
 
 ![Fans tab of the application: status, control mode, setting, voltage and speed of every fan](docs/images/Control_App_Fan_Tab.png)
 

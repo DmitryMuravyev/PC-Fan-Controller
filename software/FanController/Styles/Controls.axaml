@@ -345,4 +345,21 @@
 
     </Style>
 
+
+    <!-- Button of a destructive action (e.g. Factory Reset; colors in ThemeResources.axaml) -->
+    <Style Selector="Button.dangerButton">
+        <Setter Property="Background" Value="{DynamicResource DangerButtonBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource DangerButtonForeground}" />
+
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource DangerButtonBackgroundPointerOver}" />
+            <Setter Property="Foreground" Value="{DynamicResource DangerButtonForeground}" />
+        </Style>
+
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource DangerButtonBackgroundPressed}" />
+            <Setter Property="Foreground" Value="{DynamicResource DangerButtonForeground}" />
+        </Style>
+    </Style>
+
 </Styles>

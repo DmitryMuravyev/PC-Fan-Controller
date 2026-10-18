@@ -30,6 +30,12 @@
             <SolidColorBrush x:Key="OverallStateOvercool"       Opacity="0.5"   Color="DeepSkyBlue" />
             <SolidColorBrush x:Key="OverallStateUnavailable"    Opacity="0.5"   Color="Gray" />
 
+            <!-- Buttons of destructive actions (Factory Reset) -->
+            <SolidColorBrush x:Key="DangerButtonBackground"             Opacity="1.0"   Color="#7A1F2B" />
+            <SolidColorBrush x:Key="DangerButtonBackgroundPointerOver"  Opacity="1.0"   Color="#962634" />
+            <SolidColorBrush x:Key="DangerButtonBackgroundPressed"      Opacity="1.0"   Color="#5E1720" />
+            <SolidColorBrush x:Key="DangerButtonForeground"             Opacity="1.0"   Color="White" />
+
             <!-- Other -->
             <SolidColorBrush x:Key="GlobalInfo"                 Opacity="1.0"   Color="DeepSkyBlue" />
         </ResourceDictionary>

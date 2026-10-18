@@ -15,7 +15,7 @@ The controller works on its own and keeps its configuration in the microcontroll
 - 6 fan channels: PWM control and speed measurement for all of them (MAX31790), supply voltage control via DC-DC converters with digital potentiometers (DS1841) for 4 of them;
 - control modes: PWM, DC-DC (supply voltage) and On/Off; the "Pro" mode allows switching between PWM and DC-DC if one of them fails;
 - operation modes: Normal, Manual, Silent and Turbo;
-- automatic detection of the channel hardware and the connected fans: 3- or 4-wire connection (using a two-wire configuration is possible, but it must be set up via the control software), PWM and voltage control ranges, minimum speed, spin-up requirements;
+- detection of the channel hardware and the connected fans by a scan: 3- or 4-wire connection (using a two-wire configuration is possible, but it must be set up via the control software), PWM and voltage control ranges, minimum speed, spin-up requirements;
 - optional detection of the fan model features: size (inertia), power, server/desktop class (experimental);
 - smooth speed changes with a configurable rate, spin-up of stopped fans, PID speed control;
 - the fans are stopped when all their sensors are below the lower temperature limit (can be disabled per fan);
@@ -39,11 +39,29 @@ The controller works on its own and keeps its configuration in the microcontroll
 
 <h2>Configuration</h2>
 
-- Automatic configuration on the first start;
+- the fan channel hardware is detected on the first start; the fans and sensors are added by scans (see [First start and scanning](#first-start-and-scanning)), and the configuration is built from the results;
 - the configuration is stored in Flash; 4 pages are written in turn to spread the wear, and an interrupted write never damages the active configuration;
 - the complete configuration can be replaced from the host in one session (backup restore).
 
 <h1>How to use it</h1>
+
+<h2>First start and scanning</h2>
+
+The controller learns about its fan channels, the connected fans and the temperature sensors by three separate scans:
+
+| Scan | What it detects | Duration |
+|---|---|---|
+| **Hardware** | For each fan channel: PWM control, DC-DC converter and voltmeter | About 1 minute per channel, up to 5 minutes for all |
+| **Fans** | For each fan: whether it is connected, 3- or 4-wire connection, PWM and voltage control ranges, minimum speed, spin-up requirements (and optionally the model features) | Up to 10 minutes per fan, so up to an hour for all six |
+| **Sensors** | The DS18B20 sensors on both OneWire buses; it also activates the built-in sensors | A few seconds |
+
+The sensor scan is separate from the fan scan, so new sensors can be added quickly, without scanning the fans again.
+
+What happens on the first start depends on the firmware build:
+- **With display support** (the default): the controller only runs the **hardware** scan. Then start the **fan** scan and the **sensor** scan yourself: from the menu (**Scan fans**, **Scan sensors**, see below) or from the control software (*Fans* tab: *Scan All Fans*, or *Rescan Fan* for the selected fans; *Sensors* tab: *Rescan Sensors*). Until the sensor scan is done, the built-in sensors (if they are enabled in the firmware) are shown as present but don't provide readings.
+- **Without display support:** the controller runs the whole sequence automatically: hardware, fans, then sensors.
+
+A shorter fan scan (about 1 minute per fan, with the remaining parameters detected during normal operation) is planned for a future version.
 
 <h2>Display and button</h2>
 
@@ -57,14 +75,14 @@ The display shows several information sections in turn, each for 7 seconds: **Se
 Menu items:
 - **Buzzer options:** ON (alarms and warnings), ALRMS (alarms only), OFF;
 - **Rotate display:** rotates the image by 90°;
-- **Scan sensors**, **Scan fans**, **Scan hardware:** start the corresponding scan (with confirmation);
+- **Scan sensors**, **Scan fans**, **Scan hardware:** start the corresponding scan for all fans or sensors (with confirmation, see [First start and scanning](#first-start-and-scanning));
 - **Exit.**
 
 If the controller is busy (for example, while the host is changing the configuration), menu actions are rejected with the "Busy" message.
 
 <h2>Without the display</h2>
 
-The firmware can be built without display support (see [Build options](#build-options)). In this case:
+The firmware can be built without display support (see [Build options](#build-options)). In this case, the first start runs all scans automatically, and the button works as follows:
 - **short press:** mutes the buzzer for the current warnings and alarms (more serious problems will still be signaled);
 - **long press:** rescans everything: hardware, fans and sensors.
 

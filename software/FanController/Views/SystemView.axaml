@@ -63,6 +63,7 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="{lz:Localize ButtonFactoryResetCaption}"
+                        Classes="dangerButton"
                         Click="OnFactoryResetClick"
                         Margin="5,10,5,5" 
                         ToolTip.Tip="{lz:Localize ButtonFactoryResetTip}" />

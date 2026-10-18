@@ -84,7 +84,7 @@ With a single power supply, the fans get the supply voltage, so it must match th
 2. Assemble the board according to the schematic (see [Bill of materials](#bill-of-materials)). Check in particular:
    - **X1 must be a 12 MHz resonator:** the firmware's clock configuration (12 MHz × 4 = 48 MHz) requires it, and USB doesn't work with another frequency;
    - the 32.768 kHz crystal X2 needs the 10pF load capacitors C43 and C48.
-3. Flash the firmware via USB (BOOT jumper) or via SWD (PGM header), see [firmware/README.md](/firmware/README.md#flashing). On the first start, the controller detects its hardware and the connected fans.
+3. Flash the firmware via USB (BOOT jumper) or via SWD (PGM header), see [firmware/README.md](/firmware/README.md#flashing). On the first start, the controller detects its fan channel hardware; then scan the fans and the sensors (see [First start and scanning](/firmware/README.md#first-start-and-scanning)).
 
 <h1>License</h1>
 
