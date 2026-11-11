@@ -104,7 +104,8 @@ static uint8_t  *USBD_CUSTOM_HID_GetDeviceQualifierDesc(uint16_t *length);
 
 static uint8_t  USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum);
 
-static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum);
+// Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+//static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum);
 static uint8_t  USBD_CUSTOM_HID_EP0_RxReady(USBD_HandleTypeDef  *pdev);
 /**
   * @}
@@ -122,7 +123,7 @@ USBD_ClassTypeDef  USBD_CUSTOM_HID =
   NULL, /*EP0_TxSent*/
   USBD_CUSTOM_HID_EP0_RxReady, /*EP0_RxReady*/ /* STATUS STAGE IN */
   USBD_CUSTOM_HID_DataIn, /*DataIn*/
-  USBD_CUSTOM_HID_DataOut,
+  NULL,	//USBD_CUSTOM_HID_DataOut,	// Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
   NULL, /*SOF */
   NULL,
   NULL,
@@ -153,7 +154,7 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgFSDesc[USB_CUSTOM_HID_CONFIG_DES
   USB_DESC_TYPE_INTERFACE,/*bDescriptorType: Interface descriptor type*/
   0x00,         /*bInterfaceNumber: Number of Interface*/
   0x00,         /*bAlternateSetting: Alternate setting*/
-  0x02,         /*bNumEndpoints*/
+  0x01,         /*bNumEndpoints*/	// Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
   0x03,         /*bInterfaceClass: CUSTOM_HID*/
   0x00,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
   0x00,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
@@ -181,13 +182,14 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgFSDesc[USB_CUSTOM_HID_CONFIG_DES
   CUSTOM_HID_FS_BINTERVAL,          /*bInterval: Polling Interval */
   /* 34 */
 
-  0x07,          /* bLength: Endpoint Descriptor size */
-  USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
-  CUSTOM_HID_EPOUT_ADDR,  /*bEndpointAddress: Endpoint Address (OUT)*/
-  0x03, /* bmAttributes: Interrupt endpoint */
-  CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
-  0x00,
-  CUSTOM_HID_FS_BINTERVAL,  /* bInterval: Polling Interval */
+  // Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+  //0x07,          /* bLength: Endpoint Descriptor size */
+  //USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
+  //CUSTOM_HID_EPOUT_ADDR,  /*bEndpointAddress: Endpoint Address (OUT)*/
+  //0x03, /* bmAttributes: Interrupt endpoint */
+  //CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
+  //0x00,
+  //CUSTOM_HID_FS_BINTERVAL,  /* bInterval: Polling Interval */
   /* 41 */
 };
 
@@ -212,7 +214,7 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgHSDesc[USB_CUSTOM_HID_CONFIG_DES
   USB_DESC_TYPE_INTERFACE,/*bDescriptorType: Interface descriptor type*/
   0x00,         /*bInterfaceNumber: Number of Interface*/
   0x00,         /*bAlternateSetting: Alternate setting*/
-  0x02,         /*bNumEndpoints*/
+  0x01,         /*bNumEndpoints*/	// Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
   0x03,         /*bInterfaceClass: CUSTOM_HID*/
   0x00,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
   0x00,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
@@ -240,13 +242,14 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_CfgHSDesc[USB_CUSTOM_HID_CONFIG_DES
   CUSTOM_HID_HS_BINTERVAL,          /*bInterval: Polling Interval */
   /* 34 */
 
-  0x07,          /* bLength: Endpoint Descriptor size */
-  USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
-  CUSTOM_HID_EPOUT_ADDR,  /*bEndpointAddress: Endpoint Address (OUT)*/
-  0x03, /* bmAttributes: Interrupt endpoint */
-  CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
-  0x00,
-  CUSTOM_HID_HS_BINTERVAL,  /* bInterval: Polling Interval */
+  // Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+  //0x07,          /* bLength: Endpoint Descriptor size */
+  //USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
+  //CUSTOM_HID_EPOUT_ADDR,  /*bEndpointAddress: Endpoint Address (OUT)*/
+  //0x03, /* bmAttributes: Interrupt endpoint */
+  //CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
+  //0x00,
+  //CUSTOM_HID_HS_BINTERVAL,  /* bInterval: Polling Interval */
   /* 41 */
 };
 
@@ -271,7 +274,7 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_OtherSpeedCfgDesc[USB_CUSTOM_HID_CO
   USB_DESC_TYPE_INTERFACE,/*bDescriptorType: Interface descriptor type*/
   0x00,         /*bInterfaceNumber: Number of Interface*/
   0x00,         /*bAlternateSetting: Alternate setting*/
-  0x02,         /*bNumEndpoints*/
+  0x01,         /*bNumEndpoints*/	// Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
   0x03,         /*bInterfaceClass: CUSTOM_HID*/
   0x00,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
   0x00,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
@@ -299,13 +302,14 @@ __ALIGN_BEGIN static uint8_t USBD_CUSTOM_HID_OtherSpeedCfgDesc[USB_CUSTOM_HID_CO
   CUSTOM_HID_FS_BINTERVAL,          /*bInterval: Polling Interval */
   /* 34 */
 
-  0x07,          /* bLength: Endpoint Descriptor size */
-  USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
-  CUSTOM_HID_EPOUT_ADDR,  /*bEndpointAddress: Endpoint Address (OUT)*/
-  0x03, /* bmAttributes: Interrupt endpoint */
-  CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
-  0x00,
-  CUSTOM_HID_FS_BINTERVAL,  /* bInterval: Polling Interval */
+  // Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+  //0x07,          /* bLength: Endpoint Descriptor size */
+  //USB_DESC_TYPE_ENDPOINT, /* bDescriptorType: */
+  //CUSTOM_HID_EPOUT_ADDR,  /*bEndpointAddress: Endpoint Address (OUT)*/
+  //0x03, /* bmAttributes: Interrupt endpoint */
+  //CUSTOM_HID_EPOUT_SIZE,  /* wMaxPacketSize: 2 Bytes max  */
+  //0x00,
+  //CUSTOM_HID_FS_BINTERVAL,  /* bInterval: Polling Interval */
   /* 41 */
 };
 
@@ -367,10 +371,13 @@ static uint8_t  USBD_CUSTOM_HID_Init(USBD_HandleTypeDef *pdev,
   pdev->ep_in[CUSTOM_HID_EPIN_ADDR & 0xFU].is_used = 1U;
 
   /* Open EP OUT */
+  // Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+  /*
   USBD_LL_OpenEP(pdev, CUSTOM_HID_EPOUT_ADDR, USBD_EP_TYPE_INTR,
                  CUSTOM_HID_EPOUT_SIZE);
 
   pdev->ep_out[CUSTOM_HID_EPOUT_ADDR & 0xFU].is_used = 1U;
+  */
 
   pdev->pClassData = USBD_malloc(sizeof(USBD_CUSTOM_HID_HandleTypeDef));
 
@@ -383,11 +390,15 @@ static uint8_t  USBD_CUSTOM_HID_Init(USBD_HandleTypeDef *pdev,
     hhid = (USBD_CUSTOM_HID_HandleTypeDef *) pdev->pClassData;
 
     hhid->state = CUSTOM_HID_IDLE;
+    hhid->IsReportAvailable = 0U;
     ((USBD_CUSTOM_HID_ItfTypeDef *)pdev->pUserData)->Init();
 
     /* Prepare Out endpoint to receive 1st packet */
+    /*
+    // Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
     USBD_LL_PrepareReceive(pdev, CUSTOM_HID_EPOUT_ADDR, hhid->Report_buf,
                            USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
+    */
   }
 
   return ret;
@@ -408,8 +419,11 @@ static uint8_t  USBD_CUSTOM_HID_DeInit(USBD_HandleTypeDef *pdev,
   pdev->ep_in[CUSTOM_HID_EPIN_ADDR & 0xFU].is_used = 0U;
 
   /* Close CUSTOM_HID EP OUT */
+  // Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+  /*
   USBD_LL_CloseEP(pdev, CUSTOM_HID_EPOUT_ADDR);
   pdev->ep_out[CUSTOM_HID_EPOUT_ADDR & 0xFU].is_used = 0U;
+  */
 
   /* FRee allocated memory */
   if (pdev->pClassData != NULL)
@@ -478,7 +492,7 @@ static uint8_t  USBD_CUSTOM_HID_Setup(USBD_HandleTypeDef *pdev,
 // Custom code block by Dmitry Muravyev (DM)
 //////////////////////////////////////////////////////////////////////
 
-            if (req->wLength > USBD_CUSTOMHID_OUTREPORT_BUF_SIZE)
+            if ((req->wLength == 0U) || (req->wLength > USBD_CUSTOMHID_OUTREPORT_BUF_SIZE))
             {
               USBD_CtlError(pdev, req);
               ret = USBD_FAIL;
@@ -663,6 +677,8 @@ static uint8_t  USBD_CUSTOM_HID_DataIn(USBD_HandleTypeDef *pdev,
   * @param  epnum: endpoint index
   * @retval status
   */
+// Changed by Dmitry Muravyev (DM) - DataOut: the Output reports are received via EP0 (SET_REPORT)
+/*
 static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev,
                                         uint8_t epnum)
 {
@@ -677,6 +693,7 @@ static uint8_t  USBD_CUSTOM_HID_DataOut(USBD_HandleTypeDef *pdev,
 
   return USBD_OK;
 }
+*/
 
 /**
   * @brief  USBD_CUSTOM_HID_EP0_RxReady

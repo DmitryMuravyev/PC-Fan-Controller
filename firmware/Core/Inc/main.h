@@ -73,6 +73,9 @@ void SystemClock_Config(void);
  */
 void USB_HID_ProcessRequest(void);
 
+// USB bus error counter (diagnostics, see USB_IRQHandler)
+extern volatile uint32_t USBErrorCount;
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

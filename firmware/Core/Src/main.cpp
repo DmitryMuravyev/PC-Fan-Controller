@@ -40,7 +40,7 @@
 //
 // USB_DEVICE/Target/usbd_conf.h		(buffer and report descriptor sizes, set in the .ioc)
 // USB_DEVICE/App/usbd_custom_hid_if.c	(report descriptor, data reception)
-// Drivers/USB/usbd_customhid.h			(64-byte endpoints, moved from Middlewares)
+// Drivers/USB/usbd_customhid.h			(64-byte IN endpoint, no OUT endpoint, moved from Middlewares)
 // Drivers/USB/usbd_customhid.c			(Some corrections to the original code.)
 // Drivers/USB/usbd_desc.c				(device descriptor and version, moved from USB_DEVICE/App)
 //
@@ -137,6 +137,8 @@
 #define HOST_PING_TIMEOUT								3000	// The host service requests the System State every second. If there are no requests
 																// for 3 seconds, the USB data exchange is considered frozen.
 #define USB_RECONNECT_DELAY								200		// USB disconnection duration required for the host to detect it
+#define USB_RESTART_WAIT_TIMEOUT						10000	// Time for the host service to resume the exchange after the USB restart
+#define USB_RESTART_ATTEMPTS							3		// Number of USB restarts before the MCU reset (the last resort)
 #define USB_BUS_ACTIVITY_CHECK_DELAY					3		// SOF packets are sent every 1 ms, so the frame number must change within this time
 
 
@@ -528,10 +530,11 @@ typedef struct __attribute__((packed))
 // USB data exchange monitoring states
 typedef enum
 {
-	Host_Link_Idle							= 0,				// The host service hasn't been detected yet (initial state)
+	Host_Link_Idle							= 0,				// No host service: not detected yet or shut down (standalone mode)
 	Host_Link_Active						= 1,				// The host service polls the device regularly
 	Host_Link_Endpoints_Reset				= 2,				// Recovery stage 1 is done, waiting for the host requests
-	Host_Link_Reconnecting					= 3					// Recovery stage 2: the USB is stopped, waiting before restart
+	Host_Link_Reconnecting					= 3,				// Recovery stage 2: the USB is stopped, waiting before restart
+	Host_Link_Restarted						= 4					// The USB is restarted, waiting for the host requests
 } Host_Link_States;
 
 
@@ -996,6 +999,10 @@ TSensor_DS1841 dcdcTSensors[DCDC_COUNT] = {
 uint8_t txBuffer[64];
 volatile bool hostRequestPending = false;
 volatile uint8_t hostLinkState = Host_Link_Idle;				// USB data exchange monitoring state (see Host_Link_States)
+volatile uint8_t usbRestartCount = 0;							// The number of USB restarts since the last request from the host
+#if defined(LOGGING_ENABLED)
+uint32_t lastUSBErrorCount = 0;									// The last logged value of the USB bus error counter
+#endif
 volatile uint32_t hostLinkTick = 0;								// The last System State request from the host or the recovery stage start
 volatile Sys_Info systemState = { 0 };							// Current System state
 volatile uint32_t lastAcceptedRequestID = 0;					// The ID of the last request accepted for processing as a User Action.
@@ -1022,6 +1029,7 @@ ListCursor isrSensorSearchContext;
 // Communication vars
 // The USB handler
 extern USBD_HandleTypeDef hUsbDeviceFS;
+//extern PCD_HandleTypeDef hpcd_USB_FS;
 
 // A buffer for storing configuration change requests data.
 // I have some difficulty determining which variable should be volatile
@@ -3597,8 +3605,8 @@ void checkConfigSessionTimeout() {
 // Log the state of the USB stack and peripheral (USB freeze diagnostics).
 // Device state: 1 = DEFAULT, 2 = ADDRESSED, 3 = CONFIGURED, 4 = SUSPENDED.
 // HID state: 0 = IDLE, 1 = BUSY (the IN report hasn't been collected by the host).
-// EP1R: STAT_TX = bits 5:4, STAT_RX = bits 13:12 (0 = DISABLED, 1 = STALL, 2 = NAK, 3 = VALID),
-// DTOG_TX = bit 6, DTOG_RX = bit 14.
+// EP1R: STAT_TX = bits 5:4 (0 = DISABLED, 1 = STALL, 2 = NAK, 3 = VALID), DTOG_TX = bit 6.
+// STAT_RX (bits 13:12) is always DISABLED: the device has no OUT endpoint.
 // CNTR: FSUSP = bit 3, LPMODE = bit 2 (the peripheral is in the suspend mode).
 void logUSBState(const char * message) {
 	USBD_CUSTOM_HID_HandleTypeDef * hhid = static_cast<USBD_CUSTOM_HID_HandleTypeDef *>(hUsbDeviceFS.pClassData);
@@ -3608,7 +3616,15 @@ void logUSBState(const char * message) {
 	UL_logMessageWithLongHexParam(Logger_Severity_None, "HID state", (hhid != nullptr) ? hhid->state : 0xFF);
 	UL_logMessageWithLongHexParam(Logger_Severity_None, "EP1R", USB->EP1R);
 	UL_logMessageWithLongHexParam(Logger_Severity_None, "CNTR", USB->CNTR);
-	UL_logMessageWithLongHexParam(Logger_Severity_None, "FNR", USB->FNR);
+	//UL_logMessageWithLongHexParam(Logger_Severity_None, "FNR", USB->FNR);
+	//UL_logMessageWithLongHexParam(Logger_Severity_None, "ISTR", USB->ISTR);
+	UL_logMessageWithLongHexParam(Logger_Severity_None, "DADDR", USB->DADDR);
+	//UL_logMessageWithLongHexParam(Logger_Severity_None, "BCDR", USB->BCDR);
+	//UL_logMessageWithLongHexParam(Logger_Severity_None, "EP0R", USB->EP0R);
+	//UL_logMessageWithLongHexParam(Logger_Severity_None, "USB clock (RCC APB1ENR.USBEN)", (RCC->APB1ENR & RCC_APB1ENR_USBEN) ? 1 : 0);
+	//UL_logMessageWithLongHexParam(Logger_Severity_None, "PCD state", hpcd_USB_FS.State);
+	UL_logMessageWithLongHexParam(Logger_Severity_None, "USB errors (ERR)", USBErrorCount);
+	UL_logMessageWithLongHexParam(Logger_Severity_None, "Uptime, ms", HAL_GetTick());
 }
 #endif
 
@@ -3624,9 +3640,9 @@ bool isUSBBusActive() {
 }
 
 
-// Recovery stage 1: re-arm the Custom HID endpoints without the USB re-enumeration.
-// The data toggle of both endpoints is reset to DATA0. If it doesn't match the host's one,
-// the first packet in each direction is lost (the host repeats the request),
+// Recovery stage 1: re-arm the Custom HID IN endpoint without the USB re-enumeration.
+// The data toggle of the endpoint is reset to DATA0. If it doesn't match the host's one,
+// the first response is lost (the host repeats the request),
 // and then the exchange continues normally.
 void resetUSBEndpoints(bool busActive) {
 	HAL_NVIC_DisableIRQ(USB_IRQn);
@@ -3642,25 +3658,30 @@ void resetUSBEndpoints(bool busActive) {
 
 	USBD_CUSTOM_HID_HandleTypeDef * hhid = static_cast<USBD_CUSTOM_HID_HandleTypeDef *>(pdev->pClassData);
 	if ((pdev->dev_state == USBD_STATE_CONFIGURED) && (hhid != nullptr)) {
-		// Reopening the endpoint resets its data toggle and status
-		// (IN = NAK without pending data, OUT = ready to receive).
+		// Reopening the endpoint resets its data toggle and status (NAK without pending data)
 		USBD_LL_CloseEP(pdev, CUSTOM_HID_EPIN_ADDR);
 		USBD_LL_OpenEP(pdev, CUSTOM_HID_EPIN_ADDR, USBD_EP_TYPE_INTR, CUSTOM_HID_EPIN_SIZE);
-		USBD_LL_CloseEP(pdev, CUSTOM_HID_EPOUT_ADDR);
-		USBD_LL_OpenEP(pdev, CUSTOM_HID_EPOUT_ADDR, USBD_EP_TYPE_INTR, CUSTOM_HID_EPOUT_SIZE);
 
 		hhid->state = CUSTOM_HID_IDLE;
-		USBD_LL_PrepareReceive(pdev, CUSTOM_HID_EPOUT_ADDR, hhid->Report_buf, USBD_CUSTOMHID_OUTREPORT_BUF_SIZE);
 	}
 
 	HAL_NVIC_EnableIRQ(USB_IRQn);
 }
 
 
+// Stop the USB (the host detects the disconnection). It is started again by checkHostConnection().
+void stopUSB() {
+	USBD_DeInit(&hUsbDeviceFS);			// Removes the D+ pull-up
+	usbRestartCount++;
+	hostLinkState = Host_Link_Reconnecting;
+	hostLinkTick = HAL_GetTick();
+}
+
+
 // Monitor the USB data exchange with the host service and try to restore it if it freezes.
 // Stage 1 re-arms the HID endpoints (invisible to the host). If it doesn't help,
-// stage 2 re-initializes the USB (the host detects a disconnection). After that,
-// the monitoring returns to the initial state until the next request from the host.
+// stage 2 restarts the USB (the host detects a disconnection). If the exchange doesn't
+// resume afterwards, the restart is repeated, and the MCU reset is the last resort.
 void checkHostConnection() {
 	if (hostLinkState == Host_Link_Idle) return;
 
@@ -3675,14 +3696,46 @@ void checkHostConnection() {
 		if (elapsed < USB_RECONNECT_DELAY) return;
 
 		MX_USB_DEVICE_Init();
-		hostLinkState = Host_Link_Idle;
+		hostLinkTick = HAL_GetTick();
+		hostLinkState = Host_Link_Restarted;
 
 // Logging block
 #if defined(LOGGING_ENABLED)
-		UL_logMessage(Logger_Severity_Info, "USB restarted");
+		logUSBState("USB restarted");
 #endif
 // End of logging block
 
+		return;
+	}
+
+	// Wait for the host service to resume the exchange after the USB restart.
+	// The first System State request switches the monitoring to the Active state.
+	if (hostLinkState == Host_Link_Restarted) {
+		if (elapsed < USB_RESTART_WAIT_TIMEOUT) return;
+
+// Logging block
+#if defined(LOGGING_ENABLED)
+		bool configured = (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) ||
+						((hUsbDeviceFS.dev_state == USBD_STATE_SUSPENDED) && (hUsbDeviceFS.dev_old_state == USBD_STATE_CONFIGURED));
+		logUSBState(configured ? "USB configured, no host requests" : "USB enumeration failed");
+#endif
+// End of logging block
+
+		pendSvLock.lock();
+
+		// The service was running before the freeze and hasn't announced the shutdown,
+		// so the silence is a failure even if the enumeration was successful.
+		if (hostLinkState == Host_Link_Restarted) {
+			if (usbRestartCount < USB_RESTART_ATTEMPTS) {
+				stopUSB();
+			} else {
+				// The last resort: the same as pressing the Reset button.
+				// After the reset the monitoring stays idle until the first host request.
+				HAL_NVIC_SystemReset();
+			}
+		}
+
+		pendSvLock.unlock();
 		return;
 	}
 
@@ -3702,6 +3755,13 @@ void checkHostConnection() {
 
 	uint8_t stage = hostLinkState;
 
+// Logging block
+#if defined(LOGGING_ENABLED)
+	// The state before the recovery action (the frozen state itself)
+	logUSBState((stage == Host_Link_Active) ? "USB exchange freeze suspected (stage 1)" : "USB exchange freeze suspected (stage 2)");
+#endif
+// End of logging block
+
 	pendSvLock.lock();
 
 	// A request could arrive while we were checking the bus. Under the lock,
@@ -3712,11 +3772,10 @@ void checkHostConnection() {
 		if (stage == Host_Link_Active) {
 			resetUSBEndpoints(busActive);
 			hostLinkState = Host_Link_Endpoints_Reset;
+			hostLinkTick = HAL_GetTick();
 		} else {
-			USBD_DeInit(&hUsbDeviceFS);			// Removes the D+ pull-up, so the host detects the disconnection
-			hostLinkState = Host_Link_Reconnecting;
+			stopUSB();
 		}
-		hostLinkTick = HAL_GetTick();
 	}
 
 	pendSvLock.unlock();
@@ -3724,7 +3783,9 @@ void checkHostConnection() {
 // Logging block
 #if defined(LOGGING_ENABLED)
 	if (freezeConfirmed) {
-		logUSBState((stage == Host_Link_Active) ? "USB exchange freeze, endpoints reset" : "USB exchange freeze, USB stopped");
+		UL_logMessage(Logger_Severity_Warning, (stage == Host_Link_Active) ? "USB endpoints reset" : "USB stopped");
+	} else {
+		UL_logMessage(Logger_Severity_Info, "USB exchange resumed, no recovery needed");
 	}
 #endif
 // End of logging block
@@ -4073,6 +4134,17 @@ int main(void)
 			// If it is not yet time to update the interface - continue runloop.
 			if (ticksSinceLastUpdate < UPDATE_DELAY) continue;
 			lastUpdateTick = currentTick;
+
+// Logging block
+#if defined(LOGGING_ENABLED)
+			// Log the USB bus errors as soon as they appear
+			uint32_t usbErrors = USBErrorCount;
+			if (usbErrors != lastUSBErrorCount) {
+				lastUSBErrorCount = usbErrors;
+				UL_logMessageWithLongHexParam(Logger_Severity_Warning, "USB bus errors", usbErrors);
+			}
+#endif
+// End of logging block
 
 #if defined(DISPLAY_ENABLED)
 
@@ -5331,7 +5403,7 @@ void USB_HID_ProcessRequest(void)
 				// Prepare controller to Host shutdown (reboot or power off)
 				case Command_Prepare_To_Host_Shutdown:
 					// The host's silence is expected now, so stop monitoring the exchange
-					hostLinkState = Host_Link_Idle;
+					if (hostLinkState != Host_Link_Reconnecting) hostLinkState = Host_Link_Idle;
 					// For the moment we only need to prepare the sensors for host shutdown
 					for (uint8_t i = 0; i < getSensorCount(); i++) {
 						TSensor_base * currentSensor = static_cast<TSensor_base*>(getSensorAtIndex(i, &isrSensorSearchContext));
@@ -5364,6 +5436,7 @@ void USB_HID_ProcessRequest(void)
 					// of the host service (see checkHostConnection())
 					case Command_Get_System_State:
 						if (hostLinkState != Host_Link_Reconnecting) {
+							usbRestartCount = 0;
 							hostLinkState = Host_Link_Active;
 							hostLinkTick = HAL_GetTick();
 						}

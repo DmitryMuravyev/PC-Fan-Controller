@@ -42,6 +42,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
+volatile uint32_t USBErrorCount = 0;		// Bus errors: CRC, bit stuffing, framing, etc. (ISTR.ERR)
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -229,6 +231,13 @@ void TIM15_IRQHandler(void)
 void USB_IRQHandler(void)
 {
   /* USER CODE BEGIN USB_IRQn 0 */
+
+  // Count the USB bus errors (the HAL handler ignores them).
+  // The flag is cleared here, so each error is counted once.
+  if ((USB->ISTR & USB_ISTR_ERR) != 0) {
+	USBErrorCount++;
+	USB->ISTR = (uint16_t)~USB_ISTR_ERR;
+  }
 
   /* USER CODE END USB_IRQn 0 */
   HAL_PCD_IRQHandler(&hpcd_USB_FS);
