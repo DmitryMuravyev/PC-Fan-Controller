@@ -76,7 +76,7 @@ public partial class MainWindowViewModel : ViewModelBase
         get => _selectedDevice;
         set
         {
-            if (_selectedDevice?.Id == value?.Id) return;
+            if (ReferenceEquals(_selectedDevice, value)) return;
             _selectedDevice = value;
             OnPropertyChanged();
             OnSelectedDeviceChanged();
@@ -188,7 +188,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // The host's devices go away with it
         foreach (var device in Devices.Where(d => d.Service == e.Service).ToList())
-            RemoveDevice(device.Id);
+            RemoveDevice(e.Service, device.Id);
     }
 
 
@@ -200,7 +200,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnDeviceRemoved(object? sender, DeviceEventArgs e)
     {
-        if (sender is ServiceItem) RemoveDevice(e.Device.Id);
+        if (sender is ServiceItem service) RemoveDevice(service, e.Device.Id);
     }
 
 
@@ -237,7 +237,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void AddDevice(ServiceItem service, RemoteDevice device)
     {
-        if (_disposed || Devices.Any(d => d.Id == device.Id)) return;
+        if (_disposed || Devices.Any(d => (d.Service == service) && (d.Id == device.Id))) return;
 
         var deviceItem = new DeviceItem(service, device);
         deviceItem.DeviceAvailabilityUpdated += OnDeviceAvailabilityUpdated;
@@ -247,11 +247,11 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
 
-    private void RemoveDevice(string deviceId)
+    private void RemoveDevice(ServiceItem service, string deviceId)
     {
         if (_disposed) return;
 
-        var device = Devices.FirstOrDefault(d => d.Id == deviceId);
+        var device = Devices.FirstOrDefault(d => (d.Service == service) && (d.Id == deviceId));
         if (device is null) return;
 
         // Deselection clears the state of this and the tab ViewModels (see ClearState)
