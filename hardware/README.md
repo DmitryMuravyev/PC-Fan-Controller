@@ -47,7 +47,7 @@ The links to the components used by the author are on the [OSHWLab page](https:/
 | SENS1, SENS2 | XH2.54, 3 pins | OneWire buses for DS18B20 sensors (pull-up resistors are on the board) |
 | PWR1 | Molex 4-pin (IDE) | +12V and +5V from the PC power supply |
 | PWR2 | 5569, 2x2, 4.2 mm | +12V |
-| USB | XH2.54, 4 pins | USB connection (e.g. to an internal USB header of the motherboard) |
+| USB | XH2.54, 4 pins | USB connection (e.g. to an internal USB header of the motherboard); use a good-quality cable, see [USB cable](#usb-cable) |
 | PGM | 2.54 mm, 1x5 | SWD for ST-Link |
 | UART | 2.54 mm, 1x4 | Diagnostic log (see [firmware/README.md](/firmware/README.md)) |
 | BOOT | 2.54 mm, 1x2 | Jumper for the built-in USB DFU bootloader |
@@ -60,6 +60,10 @@ Pinouts (pin 1 → last pin):
 - **PGM:** GND, RESET, SWCLK, SWDIO, 3.3V;
 - **UART:** GND, TX, RX, 3.3V (TX and RX are the microcontroller's, so connect TX to the RX of the USB-UART adapter, and vice versa);
 - **BOOT:** BOOT0, 3.3V (closing the jumper starts the bootloader, see [Flashing](/firmware/README.md#flashing)).
+
+<h2>USB cable</h2>
+
+Use a **good-quality USB cable**, as short as possible, to connect the controller to the computer: for example, one made from a proper USB cable, with a twisted D+/D− pair and a shield. Loose jumper wires, long unshielded wires and worn cables cause USB bus errors. The controller then loses requests from the computer, and the control software may show it as disconnected from time to time, although the controller itself keeps working. The firmware's UART log reports such errors as "USB bus errors".
 
 <h1>Power</h1>
 

@@ -2018,8 +2018,7 @@ const Settings_Page * flashGetSettingsPage(uint32_t & activePageSerialNumber, co
 		uint32_t currentConfigSN = currentPage->configIndex;
 
 		if ((currentConfigSN != 0xFFFFFFFF) && (currentConfigSN != 0x00000000) &&
-				((currentPage->systemConfig.config.firmwareVersion >> 16) == FIRMWARE_MAJOR_VERSION) &&
-				((currentPage->systemConfig.config.firmwareVersion & 0xFFFF) <= FIRMWARE_MINOR_VERSION)) {
+				((currentPage->systemConfig.config.firmwareVersion >> 16) == FIRMWARE_MAJOR_VERSION)) {
 			uint8_t pageScore = 0;
 
 			if (currentPage->systemConfig.okMarker == SETTINGS_COMPLETENESS_MARKER) pageScore++;
@@ -2117,8 +2116,7 @@ HAL_StatusTypeDef flashStartSettingsPage(const Settings_Page * page, uint32_t se
 
 // Save System Settings data structure to the config page
 HAL_StatusTypeDef flashWriteSystemConfigToPage(const Settings_Page * page, System_Config * config) {
-	if (((config->firmwareVersion >> 16) == FIRMWARE_MAJOR_VERSION) &&
-		((config->firmwareVersion & 0xFFFF) <= FIRMWARE_MINOR_VERSION)) {
+	if ((config->firmwareVersion >> 16) == FIRMWARE_MAJOR_VERSION) {
 		// "Update" firmware version to the current one
 		config->firmwareVersion = (FIRMWARE_MAJOR_VERSION << 16) | FIRMWARE_MINOR_VERSION;
 		CALL_AND_CHECK(flashWriteBlock(reinterpret_cast<const uint32_t*>(config), reinterpret_cast<const uint32_t>(&page->systemConfig.config), sizeof(System_Config)));

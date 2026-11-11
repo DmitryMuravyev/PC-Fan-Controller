@@ -41,7 +41,8 @@ The controller works on its own and keeps its configuration in the microcontroll
 
 - the fan channel hardware is detected on the first start; the fans and sensors are added by scans (see [First start and scanning](#first-start-and-scanning)), and the configuration is built from the results;
 - the configuration is stored in Flash; 4 pages are written in turn to spread the wear, and an interrupted write never damages the active configuration;
-- the complete configuration can be replaced from the host in one session (backup restore).
+- the complete configuration can be replaced from the host in one session (backup restore);
+- the saved configuration is compatible between all versions with the same major version (1.x), so it is kept after a firmware update. The only exception is firmware 1.3: it doesn't accept a configuration saved by a later version, so going back to 1.3 resets the configuration (make a backup first).
 
 <h1>How to use it</h1>
 
@@ -102,10 +103,10 @@ The STM32F070 has a built-in USB DFU bootloader, so a programmer is not required
 The same with the command-line tool:
 
 ```
-STM32_Programmer_CLI -c port=usb1 -w FanController-1.3.hex -v -rst
+STM32_Programmer_CLI -c port=usb1 -w FanController-1.4.hex -v -rst
 ```
 
-A `.bin` file needs the start address: `-w FanController-1.3.bin 0x08000000`.
+A `.bin` file needs the start address: `-w FanController-1.4.bin 0x08000000`.
 
 Firmware updates from the control software (remotely, via the service) are planned for future versions.
 
@@ -176,7 +177,9 @@ On other systems, do the same manually:
 
 <h1>USB interface</h1>
 
-The controller is a USB HID device (Custom HID, 64-byte reports), so no drivers are required. The host sends commands in an output report and receives the answer in one of the input reports; the protocol is implemented in the [host service](/software).
+The controller is a USB HID device (Custom HID, 64-byte reports), so no drivers are required. The host sends commands in output reports over the control endpoint (`SET_REPORT`; the device has no OUT endpoint) and receives the answers in input reports on the interrupt IN endpoint; the protocol is implemented in the [host service](/software).
+
+Use a good-quality USB cable (see [USB cable](/hardware/README.md#usb-cable)). The firmware counts the USB bus errors (CRC, bit stuffing, framing) and reports them in the UART log as "USB bus errors"; a growing counter usually points to the cable.
 
 The device uses STMicroelectronics' VID `0x0483` and PID `0x5750` (the ones of ST's Custom HID examples), with the manufacturer string "Dmitry Muravyev" and the product string "Fan Controller". The service identifies the controller by these strings. If you make your own device based on this project, please get your own VID/PID pair (for example, from [pid.codes](https://pid.codes) for open-source hardware).
 

@@ -70,7 +70,7 @@ More details: [software/README.md](/software/README.md).
 
 1. **Assemble the board** (see [hardware/README.md](/hardware/README.md) and the [OSHWLab project](https://oshwlab.com/sneer2sneer/pc-fan-controller)).
 2. **Flash the firmware:** take the files from the latest `firmware-v…` release and follow [firmware/README.md](/firmware/README.md#flashing). On the first start, the controller scans its fan channel hardware.
-3. **Install the service** on the computer the controller is connected to, and start the application: see [software/README.md](/software/README.md). The service is optional: without it, the controller works with its own sensors only.
+3. **Connect the controller to the computer with a good-quality USB cable** (see [USB cable](/hardware/README.md#usb-cable)). **Install the service** on the computer the controller is connected to, and start the application: see [software/README.md](/software/README.md). The service is optional: without it, the controller works with its own sensors only.
 4. **Scan the fans and the sensors:** from the controller's menu or from the application. A fan scan takes up to 10 minutes per fan. Firmware built without display support runs these scans automatically on the first start. See [First start and scanning](/firmware/README.md#first-start-and-scanning).
 
 ![Fans tab of the application: status, control mode, setting, voltage and speed of every fan](docs/images/Control_App_Fan_Tab.png)
@@ -79,11 +79,11 @@ More screenshots: [software/README.md](/software/README.md#screenshots).
 
 <h1>Compatibility</h1>
 
-The firmware and the software are released separately, with their own version tags (`firmware-vX.Y` and `software-vX.Y.Z`). The **major** version of the firmware defines the generation of the USB protocol; the service only works with controllers whose firmware major version it supports.
+The firmware and the software are released separately, with their own version tags (`firmware-vX.Y` and `software-vX.Y.Z`). The **major** version of the firmware defines the generation of the USB protocol and of the saved configuration; the service only works with controllers whose firmware major version it supports. All versions with the same major version are compatible: for example, the configuration saved by firmware 1.3 is kept after an update to 1.4. An incompatible change gets a new major version (2.0).
 
 | Firmware | Software | Notes |
 |---|---|---|
-| 1.x | 1.x | Initial public release |
+| 1.x | 1.x | Initial public release (firmware 1.3, software 1.0.0) and later 1.x versions |
 
 <h1>Feedback</h1>
 
