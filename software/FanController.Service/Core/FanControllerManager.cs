@@ -64,6 +64,11 @@ public class FanControllerManager : IManagedDeviceService, IHostedService, IAsyn
 
     // Disappeared devices are kept (unavailable), so they can reconnect
     private readonly Dictionary<string, FanController> _controllers = new();
+
+    // Controllers deactivated for a system suspend (re-activated on resume)
+    private List<FanController>? _suspendedControllers;
+    private readonly object _suspendLock = new();
+
     private readonly HostSensorManager _hostSensorManager;
 
     // Channels for broadcasting changes to all watchers
@@ -1591,6 +1596,69 @@ public class FanControllerManager : IManagedDeviceService, IHostedService, IAsyn
         {
             ctrl.PrepareForShutdown();
         }
+    }
+
+
+    /// <summary>
+    /// System suspend / hibernation: the active controllers are prepared for the host
+    /// shutdown and deactivated (waits up to <paramref name="timeout"/>).
+    /// </summary>
+    public void SuspendDevices(TimeSpan timeout)
+    {
+        List<FanController> controllers;
+        lock (_lock)
+        {
+            controllers = _controllers.Values.Where(c => c.IsActive).ToList();
+        }
+
+        lock (_suspendLock)
+        {
+            if (_suspendedControllers is not null) return;     // Already suspended
+            _suspendedControllers = controllers;
+        }
+
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation(
+                "System suspend: preparing {Count} device(s) for host shutdown.",
+                controllers.Count);
+
+        foreach (var ctrl in controllers)
+            ctrl.PrepareForShutdown();
+
+        // Deactivation sends the queued shutdown command, then closes the device
+        var deactivation = Task.WhenAll(controllers.Select(c => c.DeactivateAsync()));
+        if (!deactivation.Wait(timeout) && _logger.IsEnabled(LogLevel.Warning))
+            _logger.LogWarning(
+                "System suspend: devices not deactivated within {Timeout}.",
+                timeout);
+    }
+
+
+    /// <summary>
+    /// System resume: re-activates the controllers deactivated by <see cref="SuspendDevices"/>.
+    /// </summary>
+    public void ResumeDevices()
+    {
+        List<FanController>? controllers;
+        lock (_suspendLock)
+        {
+            controllers = _suspendedControllers;
+            _suspendedControllers = null;
+        }
+
+        if (controllers is null) return;
+
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation(
+                "System resume: re-activating {Count} device(s).",
+                controllers.Count);
+
+        // Off the service control thread: activation waits for a running deactivation
+        _ = Task.Run(() =>
+        {
+            foreach (var ctrl in controllers)
+                ctrl.Activate();
+        });
     }
 
 
