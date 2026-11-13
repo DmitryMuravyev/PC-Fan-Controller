@@ -101,6 +101,10 @@ builder.Services.AddSingleton<IDeviceService>(
 builder.Services.AddHostedService(sp => sp.GetRequiredService<FanControllerManager>());
 builder.Services.AddHostedService<Worker>();
 
+// Sleep / hibernation handling on Linux (systemd-logind)
+if (OperatingSystem.IsLinux())
+    builder.Services.AddHostedService<LinuxSleepMonitor>();
+
 var app = builder.Build();
 app.MapGrpcService<FanControllerManager>();
 app.Run();

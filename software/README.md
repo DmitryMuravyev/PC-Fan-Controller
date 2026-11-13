@@ -129,16 +129,19 @@ sudo bash install-service.sh
 ### Shutdown, sleep and hibernation
 
 When the service stops (computer shutdown or restart), it tells the controllers that
-the host is going down. On Windows, it also does this when the computer goes to
-sleep or hibernates, and resumes the controllers when it wakes up.
+the host is going down. It also does this when the computer goes to sleep or
+hibernates, and resumes the controllers when it wakes up.
 
 Windows 10/11 **Fast Startup** (on by default) turns *Shut down* into a hibernation
 of the system and the services: the service is not stopped, only suspended. The
 controllers are notified in this case too, as on any hibernation. *Restart* always
 stops the service completely.
 
-On Linux, sleep and hibernation are not handled yet: the controllers are notified on
-shutdown and restart only.
+On Linux, sleep is detected through systemd-logind (D-Bus). The service delays the
+sleep until the controllers are notified (at most `InhibitDelayMaxSec` of
+`logind.conf`, 5 seconds by default). Without logind, the controllers are notified on
+shutdown and restart only. `systemd-inhibit --list` shows the service's "delay" lock
+while sleep handling is active.
 
 ### Configuration
 
@@ -179,6 +182,10 @@ Start `FanController` (Windows: `FanController.exe`). The local host
 host list (gear button). The application settings are stored in
 `%LOCALAPPDATA%\FanController\settings.json` (Windows) or
 `~/.local/share/FanController/settings.json` (Linux).
+
+**Upgrading from 1.0.1 or earlier:** the default port was 51515 before. The host
+list of an existing installation keeps the old port: change it to 31313 for every
+host (gear button), or remove the hosts and add them again.
 
 The application and the service must use the same contract version; a host with an
 incompatible service version is shown as *Incompatible* in the host list. Update

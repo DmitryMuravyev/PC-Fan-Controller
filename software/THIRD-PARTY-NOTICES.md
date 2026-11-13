@@ -15,6 +15,7 @@ available at the linked project pages and in the respective NuGet packages.
 | protobuf-net, protobuf-net.Grpc, protobuf-net.Grpc.AspNetCore | Apache-2.0 | https://github.com/protobuf-net/protobuf-net |
 | gRPC for .NET (Grpc.AspNetCore.Server, Grpc.Core.Api, Grpc.Net.Common) | Apache-2.0 | https://github.com/grpc/grpc-dotnet |
 | Serilog, Serilog.AspNetCore, Serilog.Expressions, Serilog.Sinks.File, Serilog.Sinks.Debug | Apache-2.0 | https://github.com/serilog/serilog |
+| Tmds.DBus.Protocol | MIT | https://github.com/tmds/Tmds.DBus |
 | Microsoft.Extensions.Hosting.WindowsServices / .Systemd, ASP.NET Core, .NET runtime | MIT | https://github.com/dotnet |
 
 The LibreHardwareMonitorLib components are used unmodified, as NuGet packages.
