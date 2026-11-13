@@ -3,7 +3,7 @@
 ## Known limitations
 
 The Fan Controller service accepts **unauthenticated, unencrypted** gRPC connections
-on TCP port 51515 on **all network interfaces**, and runs with administrator / root
+on TCP port 31313 on **all network interfaces**, and runs with administrator / root
 privileges. Anyone who can reach this port can read the sensor data and change the
 controller configuration, including a factory reset.
 

@@ -16,7 +16,7 @@ This folder is part of the [Fan Controller](../README.md) project; see also the
 
 | Project | Description |
 |---|---|
-| `FanController.Service` | Windows service / Linux systemd daemon. Discovers the controllers, keeps their state, sends commands, and transmits the host's temperature sensors (CPU, GPU, storage, …) to the controllers. Serves a gRPC API on TCP port 51515. |
+| `FanController.Service` | Windows service / Linux systemd daemon. Discovers the controllers, keeps their state, sends commands, and transmits the host's temperature sensors (CPU, GPU, storage, …) to the controllers. Serves a gRPC API on TCP port 31313. |
 | `FanController` | Avalonia desktop application (Windows, Linux). Connects to the services of one or more hosts. |
 | `FanController.Contracts` | gRPC service contract and data types shared by the service and the application. |
 
@@ -126,16 +126,43 @@ sudo bash install-service.sh
   `journalctl -u fancontrollerservice -f`
 - Uninstall: `sudo bash uninstall-service.sh`
 
+### Shutdown, sleep and hibernation
+
+When the service stops (computer shutdown or restart), it tells the controllers that
+the host is going down. On Windows, it also does this when the computer goes to
+sleep or hibernates, and resumes the controllers when it wakes up.
+
+Windows 10/11 **Fast Startup** (on by default) turns *Shut down* into a hibernation
+of the system and the services: the service is not stopped, only suspended. The
+controllers are notified in this case too, as on any hibernation. *Restart* always
+stops the service completely.
+
+On Linux, sleep and hibernation are not handled yet: the controllers are notified on
+shutdown and restart only.
+
 ### Configuration
 
 `appsettings.json` in the installation folder:
 
 | Setting | Default | Description |
 |---|---|---|
-| `Service:GrpcPort` | 51515 | TCP port of the gRPC API |
+| `Service:GrpcPort` | 31313 | TCP port of the gRPC API |
 | `Service:Logging:RollingInterval` | Day | Log file rolling interval |
 | `Service:Logging:RetainedFileCountLimit` | 30 | Number of log files kept |
 | `Serilog:MinimumLevel` | Information | Log levels (per component) |
+
+If you change the port, change it in the host list of the application too.
+
+#### Why port 31313
+
+The default port is outside the ranges the operating systems hand out on their own:
+
+- **Windows** uses 49152–65535 for outgoing connections, and Hyper-V, WSL and
+  Docker reserve random blocks of that range at every boot. A service port in this
+  range can be blocked on some boots (socket error 10013, "access forbidden"), and the
+  service then fails to start.
+- **Linux** uses 32768–60999 for outgoing connections by default.
+- 31313 is not registered with IANA for any other service, and it's easy to remember.
 
 Log files:
 
@@ -148,7 +175,7 @@ Log files:
 ## Running the application
 
 Start `FanController` (Windows: `FanController.exe`). The local host
-(`127.0.0.1:51515`) is configured by default; other computers are added in the
+(`127.0.0.1:31313`) is configured by default; other computers are added in the
 host list (gear button). The application settings are stored in
 `%LOCALAPPDATA%\FanController\settings.json` (Windows) or
 `~/.local/share/FanController/settings.json` (Linux).
@@ -160,7 +187,7 @@ both together.
 ## Security notice
 
 The service accepts **unauthenticated, unencrypted** gRPC connections on TCP port
-51515 on **all network interfaces**, and runs with administrator / root privileges.
+31313 on **all network interfaces**, and runs with administrator / root privileges.
 Anyone who can reach this port can read the sensor data and change the controller
 configuration, including a factory reset.
 

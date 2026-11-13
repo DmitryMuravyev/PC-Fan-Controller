@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using ProtoBuf.Grpc.Server;
 using Serilog;
 using Serilog.Templates;
@@ -65,6 +66,11 @@ builder.WebHost.UseSetting(WebHostDefaults.ServerUrlsKey, string.Empty);
 // Windows Service / Linux systemd integration (no-op when started from a console)
 builder.Services.AddWindowsService(options => options.ServiceName = "FanController");
 builder.Services.AddSystemd();
+
+// Sleep / hibernation handling (replaces the lifetime registered by AddWindowsService)
+if (OperatingSystem.IsWindows() && WindowsServiceHelpers.IsWindowsService())
+    builder.Services.AddSingleton<IHostLifetime, PowerAwareServiceLifetime>();
+
 builder.Services.AddCodeFirstGrpc();
 builder.Services.Configure<HostOptions>(options =>
     options.ShutdownTimeout = TimeSpan.FromSeconds(15));
@@ -78,7 +84,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.Limits.Http2.KeepAlivePingTimeout = TimeSpan.FromSeconds(10);
 
     // TCP endpoint: local and remote connections, without TLS
-    int port = serviceSection.GetValue("GrpcPort", 51515);
+    int port = serviceSection.GetValue("GrpcPort", 31313);
     options.ListenAnyIP(port, o => o.Protocols = HttpProtocols.Http2);
 });
 
