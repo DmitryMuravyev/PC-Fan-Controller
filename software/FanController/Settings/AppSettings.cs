@@ -15,7 +15,7 @@ public static class SettingsDefaults
 {
     public const string DefaultDaemonName = "Local Host";
     public const string DefaultDaemonAddress = "127.0.0.1";
-    public const int DefaultDaemonPort = 51515;
+    public const int DefaultDaemonPort = 31313;
 }
 
 

@@ -5076,7 +5076,7 @@ namespace FanController.Assets.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Host daemon Port (the default one is 51515).
+        ///   Looks up a localized string similar to Host daemon Port (the default one is 31313).
         /// </summary>
         public static string HostPortParameterTip {
             get {

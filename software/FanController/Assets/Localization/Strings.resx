@@ -211,7 +211,7 @@
     <value>Host name (displayed in Available Device List)</value>
   </data>
   <data name="HostPortParameterTip" xml:space="preserve">
-    <value>Host daemon Port (the default one is 51515)</value>
+    <value>Host daemon Port (the default one is 31313)</value>
   </data>
   <data name="HostAddressParameterTip" xml:space="preserve">
     <value>Host address (domain name or IP)</value>
