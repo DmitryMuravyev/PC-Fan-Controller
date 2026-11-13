@@ -2,7 +2,7 @@
 
   <!-- Product information shared by all projects (the only place to change the version) -->
   <PropertyGroup>
-    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <!-- Optional pre-release label, e.g. beta.1 (empty for a release) -->
     <VersionSuffix></VersionSuffix>
 

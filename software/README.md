@@ -30,6 +30,9 @@ This folder is part of the [Fan Controller](../README.md) project; see also the
 - Fan substitution matrix, buzzer alarm options, display settings
 - Configuration backup and restore (JSON)
 - Several hosts and controllers in one application
+- The controllers are notified when the computer shuts down, restarts, sleeps or
+  hibernates, including Windows Fast Startup (see
+  [Shutdown, sleep and hibernation](#shutdown-sleep-and-hibernation))
 
 ### Screenshots
 
@@ -183,9 +186,16 @@ host list (gear button). The application settings are stored in
 `%LOCALAPPDATA%\FanController\settings.json` (Windows) or
 `~/.local/share/FanController/settings.json` (Linux).
 
-**Upgrading from 1.0.1 or earlier:** the default port was 51515 before. The host
-list of an existing installation keeps the old port: change it to 31313 for every
-host (gear button), or remove the hosts and add them again.
+**Upgrading from 1.0.1 or earlier:** the default port was 51515 before.
+
+- **Service:** reinstall it with the installation script. The script replaces
+  `appsettings.json`, so the service uses port 31313 afterwards; settings you changed
+  in this file before (port, logging) have to be set again.
+- **Application:** the host list of an existing installation keeps the old port:
+  change it to 31313 for every host (gear button), or remove the hosts and add them
+  again.
+- **Windows firewall:** if you allowed remote access with an inbound rule for port
+  51515, change the rule to 31313.
 
 The application and the service must use the same contract version; a host with an
 incompatible service version is shown as *Incompatible* in the host list. Update

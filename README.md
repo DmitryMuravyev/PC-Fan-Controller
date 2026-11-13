@@ -62,6 +62,7 @@ More details: [firmware/README.md](/firmware/README.md).
 
 - Cross-platform control software (Windows/Linux) that supports network-based management of multiple controllers;
 - tracking of the built-in PC temperature sensors (MB, CPU, GPU, HDD) via the control software;
+- the controllers are notified when the computer shuts down, sleeps or hibernates;
 - configuration backup and restore.
 
 More details: [software/README.md](/software/README.md).
